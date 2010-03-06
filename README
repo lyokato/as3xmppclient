@@ -1,0 +1,35 @@
+as3xmppclient
+
+= License
+
+MIT-License
+
+= Dependencies
+
+as3crypto(patched)
+as3corelib
+as3saxparser
+as3saslclient
+
+= TODO
+
+== XEP
+
+XEP-0012: Last Activity
+XEP-0091: Legacy Delayed Delivery
+XEP-0092: Software Version
+XEP-0115: Entity Capabilities
+XEP-0153: vCard-Based Avatars
+XEP-0085: Chat State Notifications
+XEP-0045: Multi-User Chat
+XEP-0060: Publish-Subscribe
+XEP-0071: XHTML-IM
+XEP-0138: Stream Compression
+XEP-0166: Jingle
+
+== SASL Authentication
+
+X-GOOGLE-TOKEN
+EXTERNAL
+DIGEST-MD5
+
