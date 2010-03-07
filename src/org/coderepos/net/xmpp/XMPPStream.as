@@ -190,13 +190,13 @@ package org.coderepos.net.xmpp
                 var mech:ISASLMechanism = findProperSASLMechanism();
                 if (mech != null) {
                     changeState(new SASLHandler(this, mech));
-                } else if (_features.supportNonSASLAuth) {
+                //} else if (_features.supportNonSASLAuth) {
                     //changeState(new NonSASLAuthHandler(this, _config.username,
                     //_config.password));
                 } else {
                     // XXX: Accept anonymous ?
                     throw new XMPPProtocolError(
-                        "Server doesn't support neither SASL or IQ-Auth");
+                        "Server doesn't support SASL");
                 }
             }
         }
@@ -214,13 +214,13 @@ package org.coderepos.net.xmpp
             var mech:ISASLMechanism = findProperSASLMechanism();
             if (mech != null) {
                 changeState(new SASLHandler(this, mech));
-            } else if (_features.supportNonSASLAuth) {
+            //} else if (_features.supportNonSASLAuth) {
                 //changeState(new NonSASLAuthHandler(this, _config.username,
                 //_config.password));
             } else {
                 // XXX: Accept anonymous ?
                 throw new XMPPProtocolError(
-                    "Server doesn't support neither SASL or IQ-Auth");
+                    "Server doesn't support SASL");
             }
         }
 
