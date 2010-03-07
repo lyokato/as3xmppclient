@@ -7,8 +7,8 @@ package org.coderepos.net.xmpp
     import com.hurlant.crypto.hash.IHash;
 
     import org.coderepos.xml.XMLElement;
-    import org.coderepos.xmpp.XMPPNamespace;
-    import org.coderepos.xmpp.exceptions.XMPPProtocolError;
+    import org.coderepos.net.xmpp.XMPPNamespace;
+    import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
 
     // [XEP-0115]
     public class EntityCapabilities
@@ -16,7 +16,7 @@ package org.coderepos.net.xmpp
         public static function fromElement(query:XMLElement):EntityCapabilities
         {
             var cap:EntityCapabilities = new EntityCapabilities();
-            var identities:Array = query.getElementsNS("identity");
+            var identities:Array = query.getElements("identity");
             for each(var identity:XMLElement in identities) {
                 var name:String = identity.getAttr("name");
                 var category:String = identity.getAttr("category");
@@ -29,7 +29,7 @@ package org.coderepos.net.xmpp
                     // throw new XMPPProtocolError("invalid identity");
                 }
             }
-            var features:Array = query.getElementsNS("features");
+            var features:Array = query.getElements("features");
             for each(var feature:XMLElement in features)
                 cap.addFeature(feature.text);
 
@@ -65,10 +65,10 @@ package org.coderepos.net.xmpp
         {
             var verifier:String = genVerifier("sha1");
             node += "#";
-            node += verfier;
+            node += verifier;
             var q:String = '<query xmlns="' + XMPPNamespace.DISCO_INFO
                 + '" node="' + node + '">'
-            for each(var identity:String in _identities) {
+            for each(var identity:Object in _identities) {
                 q += '<identity category="' + identity.category
                     + '" name="' + identity.name
                     + '" type="' + identity.type + '" ';

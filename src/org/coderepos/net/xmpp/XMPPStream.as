@@ -52,7 +52,7 @@ package org.coderepos.net.xmpp
             _jid         = new JID(_config.username);
             _idGenerator = new IDGenerator("req:", 5);
             _saslFactory = new SASLMechanismDefaultFactory(
-                _jid.node, _config.password);
+                _jid.node, _config.password, null, "xmpp", _jid.domain);
             // XXX: JID validation ?
         }
 
@@ -351,9 +351,9 @@ package org.coderepos.net.xmpp
                     presenceTag += '<priority>' + String(priority) + '</priority>';
 
                 // TODO: vcard avatar
-                precenceTag += '<x xmlns="' + XMPPNamespace.VCARD_UPDATE + '">';
-                precenseTag += '<photo/>'
-                precenceTag += '</x>';
+                presenceTag += '<x xmlns="' + XMPPNamespace.VCARD_UPDATE + '">';
+                presenceTag += '<photo/>'
+                presenceTag += '</x>';
 
                 presenceTag += '</presence>';
             }

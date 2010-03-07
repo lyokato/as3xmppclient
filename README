@@ -30,6 +30,24 @@ XEP-0166: Jingle
 == SASL Authentication
 
 X-GOOGLE-TOKEN
+X-FACEBOOK-PLATFORM
 EXTERNAL
 DIGEST-MD5
+
+== PRESET CONFIG
+
+=== Google Talk
+
+account: myname@gmail.com
+password: mypassword
+host: talk.google.com
+port: 5223
+
+=== Facebook Chat
+
+account:  myname@chat.facebook.com
+password: mypassword
+host:     chat.facebook.com
+port:     5222
+
 
