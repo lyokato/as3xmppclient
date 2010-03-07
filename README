@@ -56,3 +56,11 @@ password: mypassword
 host:     chat.facebook.com
 port:     5222
 
+=== Livejournal
+
+account:  myname@livejournal.com
+password: mypassword
+host:     livejournal.com
+port:     5222
+
+
