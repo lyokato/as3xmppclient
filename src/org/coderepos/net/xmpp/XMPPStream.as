@@ -1,3 +1,15 @@
+/*
+Copyright (c) Lyo Kato (lyo.kato _at_ gmail.com)
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+*/
+
 package org.coderepos.net.xmpp
 {
     import flash.events.EventDispatcher;
@@ -29,6 +41,7 @@ package org.coderepos.net.xmpp
     import org.coderepos.net.xmpp.util.IDGenerator;
     import org.coderepos.net.xmpp.util.ReconnectionManager;
     import org.coderepos.net.xmpp.roster.RosterItem;
+    import org.coderepos.net.xmpp.roster.RosterResource;
 
     public class XMPPStream extends EventDispatcher
     {
@@ -279,6 +292,25 @@ package org.coderepos.net.xmpp
             return _roster;
         }
 
+        [ExternalAPI]
+        public function getRosterItem(jid:JID):RosterItem
+        {
+            var bareJID:String = jid.toBareJIDString();
+            return (bareJID in _roster) ? _roster[bareJID] : null;
+        }
+
+        [ExternalAPI]
+        public function getRosterResource(jid:JID):RosterResource
+        {
+            var resource:String = jid.resource;
+            if (resource == null || resource.length == 0)
+                throw new ArgumentError("This is not full JID: " + jid.toString());
+            var item:RosterItem = getRosterItem(jid);
+            if (item == null)
+                return null;
+            return item.getResource(resource);
+        }
+
         [InternalAPI]
         public function initiatedRoster():void
         {
@@ -343,6 +375,15 @@ package org.coderepos.net.xmpp
         }
 
         [ExternalAPI]
+        public function sendMessage(to:JID, body:String):void
+        {
+            // if toJID is in roster and has active resource,
+            // start 'chat' and use thread
+
+            // or send normal message
+        }
+
+        [ExternalAPI]
         public function changePresence(show:String, status:String, priority:int=0):void
         {
             if (!_isReady)
@@ -379,10 +420,12 @@ package org.coderepos.net.xmpp
         [InternalAPI]
         public function receivedPresence(presence:XMPPPresence):void
         {
+            //var item:RosterItem = getRosterItem(presence.from);
             if (presence.isAvailable) {
-
+                //item.setResource(presence.from.resource);
             } else {
                 // XXX: remove the resource from roster
+                //item.removeResource(presence.from.resource);
             }
 
             dispatchEvent(new XMPPPresenceEvent(
