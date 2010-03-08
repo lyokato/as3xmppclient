@@ -27,6 +27,7 @@ package org.coderepos.net.xmpp
     import org.coderepos.net.xmpp.events.XMPPPresenceEvent;
     import org.coderepos.net.xmpp.events.XMPPErrorEvent;
     import org.coderepos.net.xmpp.util.IDGenerator;
+    import org.coderepos.net.xmpp.util.ReconnectionManager;
     import org.coderepos.net.xmpp.roster.RosterItem;
 
     public class XMPPStream extends EventDispatcher
@@ -40,6 +41,7 @@ package org.coderepos.net.xmpp
         private var _jid:JID;
         private var _boundJID:JID;
         private var _idGenerator:IDGenerator;
+        private var _reconnectionManager:ReconnectionManager;
         private var _roster:Object;
         private var _isReady:Boolean;
 
@@ -50,11 +52,15 @@ package org.coderepos.net.xmpp
             _roster      = {};
             _isReady     = false;
             _features    = new XMPPServerFeatures();
+            // XXX: JID validation ?
             _jid         = new JID(_config.username);
             _idGenerator = new IDGenerator("req:", 5);
             _saslFactory = new SASLMechanismDefaultFactory(
-                _jid.node, _config.password, null, "xmpp", _jid.domain);
-            // XXX: JID validation ?
+                _jid.node, _config.password, null, "xmpp", _config.host);
+            _reconnectionManager = new ReconnectionManager(
+                _config.reconnectionAcceptableInterval,
+                _config.reconnectionMaxCountWithinInterval
+            );
         }
 
         [InternalAPI]
@@ -237,7 +243,8 @@ package org.coderepos.net.xmpp
         {
             if (_features.supportResourceBinding) {
                 dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.BINDING_RESOURCE));
-                changeState(new ResourceBindingHandler(this, _config.resource));
+                changeState(new ResourceBindingHandler(this, _config.resource,
+                    _config.resourceBindingMaxRetryCount));
             } else {
                 // without Binding
                 throw new XMPPProtocolError(
@@ -502,9 +509,15 @@ package org.coderepos.net.xmpp
 
         private function closeHandler(e:Event):void
         {
-            // TODO: reconnection
             dispose();
             dispatchEvent(e);
+
+            var canRetry:Boolean = _reconnectionManager.saveRecordAndVerify();
+            if (canRetry) {
+                start();
+            } else {
+                _reconnectionManager.clear();
+            }
         }
 
         private function ioErrorHandler(e:IOErrorEvent):void

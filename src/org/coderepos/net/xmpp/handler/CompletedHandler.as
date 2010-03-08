@@ -194,8 +194,11 @@ package org.coderepos.net.xmpp.handler
 
                 _stream.receivedSubscriptionRequest(sender);
 
-            } else { // UNSUBSCRIBE request
+            } else {
+
+                // UNSUBSCRIBE request
                 // process it automatically?
+
                 _stream.send(
                     '<presence to="' + sender.toBareJIDString()
                         + '" type="' + PresenceType.UNSUBSCRIBED + '" />'

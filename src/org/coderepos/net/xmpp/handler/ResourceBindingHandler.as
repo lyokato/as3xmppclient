@@ -19,13 +19,13 @@ package org.coderepos.net.xmpp.handler
         private var _MAX_FAILED_COUNT:uint;
         private var _currentIQID:String;
 
-        public function ResourceBindingHandler(stream:XMPPStream, resource:String="")
+        public function ResourceBindingHandler(stream:XMPPStream, resource:String="", maxRetryCount:uint=5)
         {
             _stream           = stream;
             _originalResource = resource;
             _currentResource  = resource;
             _failedCount      = 0;
-            _MAX_FAILED_COUNT = 3;
+            _MAX_FAILED_COUNT = maxRetryCount;
         }
 
         public function run():void

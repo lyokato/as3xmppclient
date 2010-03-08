@@ -14,6 +14,7 @@ package org.coderepos.net.xmpp
     import com.hurlant.crypto.tls.TLSSecurityParameters;
 
     import org.coderepos.xml.sax.XMLSAXParser;
+    import org.coderepos.xml.sax.XMLSAXParserConfig;
     import org.coderepos.xml.sax.XMLElementEventHandler;
     import org.coderepos.xml.exceptions.XMLSyntaxError;
     import org.coderepos.xml.exceptions.XMLFragmentSizeOverError;
@@ -31,7 +32,10 @@ package org.coderepos.net.xmpp
         public function XMPPConnection(config:XMPPConfig)
         {
             _socket = null;
-            _parser = new XMLSAXParser();
+            var saxConfig:XMLSAXParserConfig = new XMLSAXParserConfig();
+            saxConfig.MAX_FRAGMENT_SIZE = config.xmlMaxFragmentSize;
+            saxConfig.MAX_ELEMENT_DEPTH = config.xmlMaxElementDepth;
+            _parser = new XMLSAXParser(saxConfig);
             _config = config;
         }
 

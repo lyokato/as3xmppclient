@@ -7,8 +7,14 @@ package org.coderepos.net.xmpp
         public var username:String;
         public var password:String;
         public var resource:String;
+
         public var reconnectionAcceptableInterval:uint;
         public var reconnectionMaxCountWithinInterval:uint;
+
+        public var resourceBindingMaxRetryCount:uint;
+
+        public var xmlMaxElementDepth:uint;
+        public var xmlMaxFragmentSize:uint;
 
         public var applicationName:String;
         public var applicationCategory:String;
@@ -33,9 +39,10 @@ package org.coderepos.net.xmpp
             reconnectionAcceptableInterval     = 5;
             reconnectionMaxCountWithinInterval = 60 * 5;
 
-            // resourceBindingMaxRetryCount = 5;
-            // xmlMaxElementDepth
-            // xmlMaxFragmentSize
+            resourceBindingMaxRetryCount = 5;
+
+            xmlMaxElementDepth = 20;
+            xmlMaxFragmentSize = 1024 * 1024 * 10;
         }
     }
 }
