@@ -35,13 +35,14 @@ package org.coderepos.net.xmpp
     import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
     import org.coderepos.net.xmpp.events.XMPPStreamEvent;
     import org.coderepos.net.xmpp.events.XMPPMessageEvent;
+    import org.coderepos.net.xmpp.events.XMPPRosterEvent;
     import org.coderepos.net.xmpp.events.XMPPSubscriptionEvent;
     import org.coderepos.net.xmpp.events.XMPPPresenceEvent;
     import org.coderepos.net.xmpp.events.XMPPErrorEvent;
     import org.coderepos.net.xmpp.util.IDGenerator;
     import org.coderepos.net.xmpp.util.ReconnectionManager;
     import org.coderepos.net.xmpp.roster.RosterItem;
-    import org.coderepos.net.xmpp.roster.RosterResource;
+    import org.coderepos.net.xmpp.roster.ContactResource;
 
     public class XMPPStream extends EventDispatcher
     {
@@ -300,7 +301,7 @@ package org.coderepos.net.xmpp
         }
 
         [ExternalAPI]
-        public function getRosterResource(jid:JID):RosterResource
+        public function getContactResource(jid:JID):ContactResource
         {
             var resource:String = jid.resource;
             if (resource == null || resource.length == 0)
@@ -314,16 +315,9 @@ package org.coderepos.net.xmpp
         [InternalAPI]
         public function initiatedRoster():void
         {
-            updatedRoster();
             dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.READY));
             changeState(new CompletedHandler(this));
             _isReady = true;
-        }
-
-        [InternalAPI]
-        public function updatedRoster():void
-        {
-            //dispatchEvent(new XMPPRosterEvent.UPDATED, _roster);
         }
 
         private function findProperSASLMechanism():ISASLMechanism
@@ -343,29 +337,34 @@ package org.coderepos.net.xmpp
         [InternalAPI]
         public function setRosterItem(rosterItem:RosterItem):void
         {
-            var jidString:String = rosterItem.jid.toBareJIDString();
-            if (jidString in _roster) {
-                _roster[jidString].update(rosterItem);
+            var contact:JID = rosterItem.jid;
+            var bareJID:String = contact.toBareJIDString();
+            if (bareJID in _roster) {
+                _roster[bareJID].updateItem(rosterItem);
             } else {
-                _roster[jidString] = rosterItem;
+                _roster[bareJID] = rosterItem;
             }
+            dispatchEvent(new XMPPRosterEvent(XMPPRosterEvent.CHANGED, contact));
         }
 
         [InternalAPI]
         public function changedChatState(from:JID, state:String):void
         {
-            var jidString:String = from.toBareJIDString();
+            var bareJID:String = from.toBareJIDString();
             var resource:String  = from.resource;
-            /*
-            if (jidString in _roster) {
-                if (_roster[jidString].hasResource(resource)) {
-                    _roster[jidString].getResource(resource).changeState(state);
-                }
+            if (resource == null) {
+                // invalid format
+                return;
             }
-            */
 
-            // dispatchEvent(
-            //    new XMPPChatStateEvent(XMPPChatState.STATE_CHANGED, from, state));
+            var res:ContactResource = getContactResource(from);
+            if (res == null) {
+                // unknown contact
+            } else {
+                res.chatState = state;
+                dispatchEvent(new XMPPPresenceEvent(
+                    XMPPPresenceEvent.CHANGED, from));
+            }
         }
 
         [InternalAPI]
@@ -375,12 +374,71 @@ package org.coderepos.net.xmpp
         }
 
         [ExternalAPI]
-        public function sendMessage(to:JID, body:String):void
+        public function sendMessage(contact:JID, body:String):void
         {
-            // if toJID is in roster and has active resource,
-            // start 'chat' and use thread
+            var bareJID:String  = contact.toBareJIDString();
+            var resource:String = contact.resource;
 
-            // or send normal message
+            var rosterItem:RosterItem = getRosterItem(contact);
+            if (rosterItem == null) {
+
+                // FIXME: if not in roster, send normal message
+                sendNormalMessage(bareJID, body);
+
+            } else {
+
+                var resources:Array;
+                var cr:ContactResource;
+
+                if (resource == null) {
+                    resources = rosterItem.getAllActiveResources();
+                    if (resources.length > 0) {
+                        for each(cr in resources) {
+                            sendChatMessage(bareJID + "/" + cr.resource, body);
+                        }
+                    } else {
+                        sendNormalMessage(bareJID, body);
+                    }
+
+                } else {
+
+                    cr = rosterItem.getResource(resource);
+                    if (cr != null && cr.isActive) {
+                        sendChatMessage(bareJID + "/" + resource, body);
+                    } else {
+                        resources = rosterItem.getAllActiveResources();
+                        if (resources.length > 0) {
+                            for each(cr in resources) {
+                                sendChatMessage(bareJID + "/" + cr.resource, body);
+                            }
+                        } else {
+                            sendNormalMessage(bareJID, body);
+                        }
+                    }
+
+                }
+            }
+
+        }
+
+        private function sendChatMessage(to:String, body:String):void
+        {
+            send(
+                  '<message type="' + MessageType.CHAT
+                    + '" to="' + to + '">'
+                + '<body>' + body + '</body>'
+                + '</message>'
+            );
+        }
+
+        private function sendNormalMessage(to:String, body:String):void
+        {
+            send(
+                  '<message type="' + MessageType.NORMAL
+                    + '" to="' + to + '">'
+                + '<body>' + body + '</body>'
+                + '</message>'
+            );
         }
 
         [ExternalAPI]
@@ -420,16 +478,23 @@ package org.coderepos.net.xmpp
         [InternalAPI]
         public function receivedPresence(presence:XMPPPresence):void
         {
-            //var item:RosterItem = getRosterItem(presence.from);
-            if (presence.isAvailable) {
-                //item.setResource(presence.from.resource);
-            } else {
-                // XXX: remove the resource from roster
-                //item.removeResource(presence.from.resource);
-            }
+            var contact:JID = presence.from;
+            var item:RosterItem = getRosterItem(presence.from);
 
+            if (item == null) {
+                // presence for unknown contact
+            } else {
+                if (presence.isAvailable) {
+                    item.setResource(contact.resource, presence);
+                } else {
+                    // XXX: check if resource is not null?
+                    item.removeResource(contact.resource);
+                    //dispatchEvent(new XMPPPresenceEvent(
+                    //    XMPPPresenceEvent.REMOVED, contact));
+                }
+            }
             dispatchEvent(new XMPPPresenceEvent(
-                XMPPPresenceEvent.RECEIVED, presence));
+                XMPPPresenceEvent.CHANGED, contact));
         }
 
         [InternalAPI]

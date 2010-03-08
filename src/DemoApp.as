@@ -9,10 +9,13 @@ package
 
     import nl.demonsters.debugger.MonsterDebugger;
 
+    import org.coderepos.net.xmpp.JID;
     import org.coderepos.net.xmpp.XMPPConfig;
     import org.coderepos.net.xmpp.XMPPStream;
+    import org.coderepos.net.xmpp.XMPPMessage;
     import org.coderepos.net.xmpp.events.XMPPErrorEvent;
     import org.coderepos.net.xmpp.events.XMPPStreamEvent;
+    import org.coderepos.net.xmpp.events.XMPPMessageEvent;
 
     public class DemoApp
     {
@@ -29,6 +32,7 @@ package
         private var _rootWindow:DemoXMPP;
         private var _setting:DemoSetting;
         private var _settingWindow:DemoSettingWindow;
+        private var _chatWindows:Object;
 
         private var _conn:XMPPStream;
 
@@ -36,6 +40,7 @@ package
         {
            _debugger = new MonsterDebugger(this);
            _setting = DemoSetting.load();
+           _chatWindows = {};
         }
 
         public function get rootWindow():DemoXMPP
@@ -107,7 +112,25 @@ package
             _conn.addEventListener(XMPPStreamEvent.ESTABLISHING_SESSION, streamEstablishingHandler);
             _conn.addEventListener(XMPPStreamEvent.LOADING_ROSTER, streamLoadingHandler);
             _conn.addEventListener(XMPPStreamEvent.READY, streamReadyHandler);
+            _conn.addEventListener(XMPPMessageEvent.RECEIVED, messageReceivedHandler);
             _conn.start();
+        }
+
+        private function messageReceivedHandler(e:XMPPMessageEvent):void
+        {
+            var msg:XMPPMessage = e.message;
+            var sender:JID = msg.from;
+
+            var bareJID:String = sender.toBareJIDString();
+            var win:DemoChatWindow = _chatWindows[bareJID];
+            if (win == null || win.closed) {
+                win = new DemoChatWindow();
+                win.open();
+                win.target = bareJID;
+            }
+            _chatWindows[bareJID] = win;
+            win.activate();
+            win.pushMessage(msg);
         }
 
         public function streamStartHandler(e:XMPPStreamEvent):void

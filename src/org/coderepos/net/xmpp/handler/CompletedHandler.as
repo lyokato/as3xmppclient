@@ -509,9 +509,6 @@ package org.coderepos.net.xmpp.handler
                     _stream.send('<iq type="result" id="' + iqid + '"/>');
                 }
 
-                // XXX: or should dispatch with each item?
-                _stream.updatedRoster(); // to dispatch event
-
             } else if (type == IQType.RESULT) {
                 // do something?
             }

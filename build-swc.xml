@@ -11,6 +11,10 @@
   <compiler>
     <external-library-path>
       <path-element>${flexlib}/libs/player/10/playerglobal.swc</path-element>
+      <path-element>lib/as3saslcient-1_0_3.swc</path-element>
+      <path-element>lib/as3saxparser-1_0_3.swc</path-element>
+      <path-element>lib/as3crypto_patched.swc</path-element>
+      <path-element>lib/corelib-08.30.2007.swc</path-element>
     </external-library-path>
     
     <source-path>
@@ -39,6 +43,7 @@
       <class>org.coderepos.net.xmpp.events.XMPPStreamEvent</class>
       <class>org.coderepos.net.xmpp.events.XMPPPresenceEvent</class>
       <class>org.coderepos.net.xmpp.events.XMPPMessageEvent</class>
+      <class>org.coderepos.net.xmpp.events.XMPPRosterEvent</class>
       <class>org.coderepos.net.xmpp.events.XMPPSubscriptionEvent</class>
       <class>org.coderepos.net.xmpp.handler.IXMPPStreamHandler</class>
       <class>org.coderepos.net.xmpp.handler.InitialHandler</class>
@@ -49,7 +54,7 @@
       <class>org.coderepos.net.xmpp.handler.InitialRosterHandler</class>
       <class>org.coderepos.net.xmpp.handler.CompletedHandler</class>
       <class>org.coderepos.net.xmpp.roster.RosterItem</class>
-      <class>org.coderepos.net.xmpp.roster.RosterResource</class>
+      <class>org.coderepos.net.xmpp.roster.ContactResource</class>
       <class>org.coderepos.net.xmpp.util.IDGenerator</class>
       <class>org.coderepos.net.xmpp.util.ReconnectionManager</class>
   </include-classes>

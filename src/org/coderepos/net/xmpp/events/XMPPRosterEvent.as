@@ -13,15 +13,16 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package org.coderepos.net.xmpp.events
 {
     import flash.events.Event;
+
     import org.coderepos.net.xmpp.JID;
 
-    public class XMPPPresenceEvent extends Event
+    public class XMPPRosterEvent extends Event
     {
-        public static const CHANGED:String = "presenceChanged";
+        public static const CHANGED:String = "rosterChanged";
 
         private var _contact:JID;
 
-        public function XMPPPresenceEvent(type:String, contact:JID,
+        public function XMPPRosterEvent(type:String, contact:JID,
             bubbles:Boolean=false, cancelable:Boolean=false)
         {
             _contact = contact;
@@ -35,7 +36,7 @@ package org.coderepos.net.xmpp.events
 
         override public function clone():Event
         {
-            return new XMPPPresenceEvent(type, _contact, bubbles, cancelable);
+            return new XMPPRosterEvent(type, _contact, bubbles, cancelable);
         }
     }
 }

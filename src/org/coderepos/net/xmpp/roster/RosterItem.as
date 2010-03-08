@@ -13,6 +13,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package org.coderepos.net.xmpp.roster
 {
     import org.coderepos.net.xmpp.JID;
+    import org.coderepos.net.xmpp.XMPPPresence;
     import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
     import org.coderepos.xml.XMLElement;
 
@@ -93,12 +94,28 @@ package org.coderepos.net.xmpp.roster
             return (resource in _resources);
         }
 
-        public function addResource(resource:RosterResource):void
+        public function setResource(resource:String, presence:XMPPPresence):void
         {
-            _resources[resource.resource] = resource;
+            if (resource in _resources) {
+                _resources[resource].updatePresence(presence);
+            } else {
+                _resources[resource] = new ContactResource(resource, presence);
+            }
         }
 
-        public function getResource(resource:String):RosterResource
+        public function getAllActiveResources():Array
+        {
+            var resources:Array = [];
+            for (var prop:String in _resources) {
+                var resource:ContactResource = _resources[prop];
+                if (resource.isActive) {
+                    resources.push(resource);
+                }
+            }
+            return resources;
+        }
+
+        public function getResource(resource:String):ContactResource
         {
             return (resource in _resources) ? _resources[resource] : null;
         }
@@ -116,7 +133,7 @@ package org.coderepos.net.xmpp.roster
             return groups;
         }
 
-        public function update(item:RosterItem):void
+        public function updateItem(item:RosterItem):void
         {
             name         = item.name;
             subscription = item.subscription;
