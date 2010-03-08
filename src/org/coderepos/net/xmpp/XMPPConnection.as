@@ -155,48 +155,46 @@ package org.coderepos.net.xmpp
 
         private function socketDataHandler(e:ProgressEvent):void
         {
-            if (_socket != null && _socket.bytesAvailable > 0) {
-
-                var bytes:ByteArray = new ByteArray();
-                _socket.readBytes(bytes, 0, _socket.bytesAvailable);
-
-                try {
-
+            try {
+                while (_socket != null && _socket.bytesAvailable > 0) {
+                    var bytes:ByteArray = new ByteArray();
+                    var len:uint = (1024 > _socket.bytesAvailable)
+                        ? _socket.bytesAvailable : 1024;
+                    _socket.readBytes(bytes, 0, len);
                     bytes.position = 0;
                     trace(bytes.readUTFBytes(bytes.length));
                     bytes.position = 0;
-
                     _parser.pushBytes(bytes);
+                }
 
-                } catch (e:*) {
+            } catch (e:*) {
 
-                    disconnect();
+                disconnect();
 
-                    if (e is XMLSyntaxError) {
+                if (e is XMLSyntaxError) {
 
-                        dispatchEvent(new XMPPErrorEvent(
-                            XMPPErrorEvent.PROTOCOL_ERROR, "XML Syntax is invalid: " + e.message));
+                    dispatchEvent(new XMPPErrorEvent(
+                        XMPPErrorEvent.PROTOCOL_ERROR, "XML Syntax is invalid: " + e.message));
 
-                    } else if (e is XMLFragmentSizeOverError) {
+                } else if (e is XMLFragmentSizeOverError) {
 
-                        dispatchEvent(new XMPPErrorEvent(
-                            XMPPErrorEvent.PROTOCOL_ERROR, "XML fragment size is over."));
+                    dispatchEvent(new XMPPErrorEvent(
+                        XMPPErrorEvent.PROTOCOL_ERROR, "XML fragment size is over."));
 
-                    } else if (e is XMLElementDepthOverError) {
+                } else if (e is XMLElementDepthOverError) {
 
-                        dispatchEvent(new XMPPErrorEvent(
-                            XMPPErrorEvent.PROTOCOL_ERROR, "XML depth is over."));
+                    dispatchEvent(new XMPPErrorEvent(
+                        XMPPErrorEvent.PROTOCOL_ERROR, "XML depth is over."));
 
-                    } else if (e is XMPPProtocolError) {
+                } else if (e is XMPPProtocolError) {
 
-                        dispatchEvent(new XMPPErrorEvent(
-                            XMPPErrorEvent.PROTOCOL_ERROR, e.message));
+                    dispatchEvent(new XMPPErrorEvent(
+                        XMPPErrorEvent.PROTOCOL_ERROR, e.message));
 
-                    } else {
+                } else {
 
-                        throw e;
+                    throw e;
 
-                    }
                 }
             }
         }
