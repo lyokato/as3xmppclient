@@ -12,6 +12,7 @@ package
     import org.coderepos.net.xmpp.XMPPConfig;
     import org.coderepos.net.xmpp.XMPPStream;
     import org.coderepos.net.xmpp.events.XMPPErrorEvent;
+    import org.coderepos.net.xmpp.events.XMPPStreamEvent;
 
     public class DemoApp
     {
@@ -99,7 +100,49 @@ package
             _conn.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
             _conn.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
             _conn.addEventListener(XMPPErrorEvent.PROTOCOL_ERROR, protocolErrorHandler);
+            _conn.addEventListener(XMPPStreamEvent.START, streamStartHandler);
+            _conn.addEventListener(XMPPStreamEvent.TLS_NEGOTIATING, streamNegotiatingHandler);
+            _conn.addEventListener(XMPPStreamEvent.AUTHENTICATING, streamAuthenticatingHandler);
+            _conn.addEventListener(XMPPStreamEvent.BINDING_RESOURCE, streamBindingHandler);
+            _conn.addEventListener(XMPPStreamEvent.ESTABLISHING_SESSION, streamEstablishingHandler);
+            _conn.addEventListener(XMPPStreamEvent.LOADING_ROSTER, streamLoadingHandler);
+            _conn.addEventListener(XMPPStreamEvent.READY, streamReadyHandler);
             _conn.start();
+        }
+
+        public function streamStartHandler(e:XMPPStreamEvent):void
+        {
+            logLine("[STREAM_START]");
+        }
+
+        public function streamNegotiatingHandler(e:XMPPStreamEvent):void
+        {
+            logLine("[TLS_NEGOTIATING]");
+        }
+
+        public function streamAuthenticatingHandler(e:XMPPStreamEvent):void
+        {
+            logLine("[STREAM_AUTHENTICATING]");
+        }
+
+        public function streamBindingHandler(e:XMPPStreamEvent):void
+        {
+            logLine("[STREAM_RESOURCE_BINDING]");
+        }
+
+        public function streamEstablishingHandler(e:XMPPStreamEvent):void
+        {
+            logLine("[STREAM_SESSION_ESTABLISHING]");
+        }
+
+        public function streamLoadingHandler(e:XMPPStreamEvent):void
+        {
+            logLine("[STREAM_LOADING_ROSTER]");
+        }
+
+        public function streamReadyHandler(e:XMPPStreamEvent):void
+        {
+            logLine("[STREAM_READY]");
         }
 
         private function protocolErrorHandler(e:XMPPErrorEvent):void

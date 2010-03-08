@@ -21,6 +21,7 @@ package org.coderepos.net.xmpp
     import org.coderepos.net.xmpp.handler.CompletedHandler;
 
     import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
+    import org.coderepos.net.xmpp.events.XMPPStreamEvent;
     import org.coderepos.net.xmpp.events.XMPPMessageEvent;
     import org.coderepos.net.xmpp.events.XMPPSubscriptionEvent;
     import org.coderepos.net.xmpp.events.XMPPPresenceEvent;
@@ -135,6 +136,8 @@ package org.coderepos.net.xmpp
             _connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
             _connection.addEventListener(XMPPErrorEvent.PROTOCOL_ERROR, protocolErrorHandler);
             _connection.connect();
+
+            dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.START));
         }
 
         [ExternalAPI]
@@ -169,9 +172,17 @@ package org.coderepos.net.xmpp
         [ExternalAPI]
         public function disconnect():void
         {
-            if (connected)
+            if (connected) {
+                if (_isReady) {
+                    send('<presence type="' + PresenceType.UNAVAILABLE + '"/>');
+                    send('</stream:stream>');
+                }
                 _connection.disconnect();
-            dispose();
+                dispose();
+                dispatchEvent(new Event(Event.CLOSE));
+            } else {
+                dispose();
+            }
         }
 
         [InternalAPI]
@@ -185,14 +196,13 @@ package org.coderepos.net.xmpp
         public function initiated():void
         {
             if (_features.supportTLS) {
+                dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.TLS_NEGOTIATING));
                 changeState(new TLSHandler(this));
             } else {
                 var mech:ISASLMechanism = findProperSASLMechanism();
                 if (mech != null) {
+                    dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.AUTHENTICATING));
                     changeState(new SASLHandler(this, mech));
-                //} else if (_features.supportNonSASLAuth) {
-                    //changeState(new NonSASLAuthHandler(this, _config.username,
-                    //_config.password));
                 } else {
                     // XXX: Accept anonymous ?
                     throw new XMPPProtocolError(
@@ -213,10 +223,8 @@ package org.coderepos.net.xmpp
         {
             var mech:ISASLMechanism = findProperSASLMechanism();
             if (mech != null) {
+                dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.AUTHENTICATING));
                 changeState(new SASLHandler(this, mech));
-            //} else if (_features.supportNonSASLAuth) {
-                //changeState(new NonSASLAuthHandler(this, _config.username,
-                //_config.password));
             } else {
                 // XXX: Accept anonymous ?
                 throw new XMPPProtocolError(
@@ -228,6 +236,7 @@ package org.coderepos.net.xmpp
         public function authenticated():void
         {
             if (_features.supportResourceBinding) {
+                dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.BINDING_RESOURCE));
                 changeState(new ResourceBindingHandler(this, _config.resource));
             } else {
                 // without Binding
@@ -241,8 +250,10 @@ package org.coderepos.net.xmpp
         {
             _boundJID = jid;
             if (_features.supportSession) {
+                dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.ESTABLISHING_SESSION));
                 changeState(new SessionEstablishmentHandler(this));
             } else {
+                dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.LOADING_ROSTER));
                 changeState(new InitialRosterHandler(this));
             }
         }
@@ -250,6 +261,7 @@ package org.coderepos.net.xmpp
         [InternalAPI]
         public function establishedSession():void
         {
+            dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.LOADING_ROSTER));
             changeState(new InitialRosterHandler(this));
         }
 
@@ -264,6 +276,7 @@ package org.coderepos.net.xmpp
         public function initiatedRoster():void
         {
             updatedRoster();
+            dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.READY));
             changeState(new CompletedHandler(this));
             _isReady = true;
         }
@@ -323,39 +336,35 @@ package org.coderepos.net.xmpp
         }
 
         [ExternalAPI]
-        public function changePresence(isAvailable:Boolean, show:String,
-            status:String, priority:int=0):void
+        public function changePresence(show:String, status:String, priority:int=0):void
         {
             if (!_isReady)
                 throw new Error("not ready");
 
-            // check priority >= -127 && priority <= 128
             if (priority <= -128 && priority > 128)
                 throw new ArgumentError("priority must be in between -127 and 128");
 
             var presenceTag:String = '<presence';
-            if (!isAvailable)
-                presenceTag += ' type="' + PresenceType.UNAVAILABLE + '"'
 
-            var hasNotChild:Boolean =
-                (show == null && status == null && priority < 0);
-            if (hasNotChild) {
-                presenceTag += '/>';
-            } else {
+            var children:Array = [];
+            if (show != null)
+                children.push('<show>' + show + '</show>');
+            if (status != null)
+                children.push('<status>' + status + '</status>');
+            if (priority != 0)
+                children.push('<priority>' + String(priority) + '</priority>');
+
+            // TODO: vcard avatar
+            //var vCardTag:String = '<x xmlns="' + XMPPNamespace.VCARD_UPDATE + '">';
+            //vCardTag += '<photo/>'
+            //vCardTag += '</x>';
+
+            if (children.length > 0) {
                 presenceTag += '>';
-                if (show != null)
-                    presenceTag += '<show>' + show + '</show>';
-                if (status != null)
-                    presenceTag += '<status>' + status + '</status>';
-                if (priority != 0)
-                    presenceTag += '<priority>' + String(priority) + '</priority>';
-
-                // TODO: vcard avatar
-                presenceTag += '<x xmlns="' + XMPPNamespace.VCARD_UPDATE + '">';
-                presenceTag += '<photo/>'
-                presenceTag += '</x>';
-
+                presenceTag += children.join('');
                 presenceTag += '</presence>';
+            } else {
+                presenceTag += '/>';
             }
             send(presenceTag);
         }
@@ -363,7 +372,11 @@ package org.coderepos.net.xmpp
         [InternalAPI]
         public function receivedPresence(presence:XMPPPresence):void
         {
-            // XXX: should update roster-resource here ?
+            if (presence.isAvailable) {
+
+            } else {
+                // XXX: remove the resource from roster
+            }
 
             dispatchEvent(new XMPPPresenceEvent(
                 XMPPPresenceEvent.RECEIVED, presence));
@@ -489,6 +502,7 @@ package org.coderepos.net.xmpp
 
         private function closeHandler(e:Event):void
         {
+            // TODO: reconnection
             dispose();
             dispatchEvent(e);
         }
