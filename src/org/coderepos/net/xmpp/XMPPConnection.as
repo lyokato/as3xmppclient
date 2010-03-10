@@ -169,7 +169,6 @@ package org.coderepos.net.xmpp
 
             } catch (e:*) {
 
-                disconnect();
 
                 if (e is XMLSyntaxError) {
 
@@ -193,9 +192,13 @@ package org.coderepos.net.xmpp
 
                 } else {
 
+                    disconnect();
                     throw e;
 
                 }
+
+                disconnect();
+
             }
         }
     }

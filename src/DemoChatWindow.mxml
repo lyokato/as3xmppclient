@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Window
+    xmlns:mx="http://www.adobe.com/2006/mxml"
+    width="400"
+    height="400"
+    >
+    <mx:Script>
+    <![CDATA[
+
+        import org.coderepos.net.xmpp.XMPPMessage;
+
+        private var _bareJID:String;
+
+        public function set target(bareJID:String):void
+        {
+            _bareJID = bareJID;
+        }
+
+        public function pushMessage(message:XMPPMessage):void
+        {
+
+        }
+
+    ]]>
+    </mx:Script>
+    <mx:HBox width="100%" height="100%">
+        <mx:Panel title="Conversation" width="100%" height="100%">
+        <mx:TextArea />
+        </mx:Panel>
+    </mx:HBox>
+</mx:Window>
+

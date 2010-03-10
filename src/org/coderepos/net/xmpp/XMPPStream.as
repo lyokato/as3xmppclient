@@ -57,6 +57,7 @@ package org.coderepos.net.xmpp
         private var _idGenerator:IDGenerator;
         private var _reconnectionManager:ReconnectionManager;
         private var _roster:Object;
+        private var _services:Object;
         private var _isReady:Boolean;
 
         public function XMPPStream(config:XMPPConfig)
@@ -64,6 +65,7 @@ package org.coderepos.net.xmpp
             _config      = config;
             _attributes  = {};
             _roster      = {};
+            _services    = {};
             _isReady     = false;
             _features    = new XMPPServerFeatures();
             // XXX: JID validation ?
@@ -185,7 +187,7 @@ package org.coderepos.net.xmpp
         public function clearBuffer():void
         {
             trace("[CLEAR BUFFER]");
-            if (connected)
+            if (_connection != null)
                 _connection.clearBuffer();
         }
 
@@ -266,6 +268,11 @@ package org.coderepos.net.xmpp
             }
         }
 
+        public function get boundJID():JID
+        {
+            return _boundJID;
+        }
+
         [InternalAPI]
         public function bindJID(jid:JID):void
         {
@@ -284,6 +291,17 @@ package org.coderepos.net.xmpp
         {
             dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.LOADING_ROSTER));
             changeState(new InitialRosterHandler(this));
+        }
+
+        [InternalAPI]
+        public function addService(serviceJID:String):void
+        {
+            _services[serviceJID] = null;
+        }
+
+        [InternalAPI]
+        public function hasService(serviceJID:String):Boolean {
+            return (serviceJID in _services);
         }
 
         [ExternalAPI]
@@ -617,31 +635,39 @@ package org.coderepos.net.xmpp
 
         private function closeHandler(e:Event):void
         {
+            trace("[stream:close]");
             dispose();
             dispatchEvent(e);
-
             var canRetry:Boolean = _reconnectionManager.saveRecordAndVerify();
             if (canRetry) {
+                trace("[stream:restart]");
                 start();
             } else {
+                trace("[stream:clear]");
                 _reconnectionManager.clear();
             }
         }
 
         private function ioErrorHandler(e:IOErrorEvent):void
         {
+            trace("[stream:ioError]");
+            _reconnectionManager.inactivate();
             dispose();
             dispatchEvent(e);
         }
 
         private function securityErrorHandler(e:SecurityErrorEvent):void
         {
+            trace("[stream:securityError]");
+            _reconnectionManager.inactivate();
             dispose();
             dispatchEvent(e);
         }
 
         private function protocolErrorHandler(e:XMPPErrorEvent):void
         {
+            trace("[stream:protocolError]");
+            _reconnectionManager.inactivate();
             dispose();
             dispatchEvent(e);
         }

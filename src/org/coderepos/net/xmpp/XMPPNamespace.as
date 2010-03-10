@@ -40,6 +40,7 @@ package org.coderepos.net.xmpp
         public static const CHAT_STATE:String               = "http://jabber.org/protocol/charstates";
 
         public static const CAPS:String                     = "http://jabber.org/protocol/caps";
+        public static const COMMANDS:String                 = "http://jabber.org/protocol/commands";
         public static const XHTML_IM:String                 = "http://jabber.org/protocol/xhtml-im";
         public static const XHTML:String                    = "http://www.w3.org/1999/xhtml";
         public static const DATA:String                     = "jabber:x:data";

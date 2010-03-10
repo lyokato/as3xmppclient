@@ -48,8 +48,8 @@ package org.coderepos.net.xmpp
             applicationType     = "pc";
             applicationCategory = "client";
 
-            reconnectionAcceptableInterval     = 5;
-            reconnectionMaxCountWithinInterval = 60 * 5;
+            reconnectionAcceptableInterval     = 60 * 5;
+            reconnectionMaxCountWithinInterval = 5;
 
             resourceBindingMaxRetryCount = 5;
 

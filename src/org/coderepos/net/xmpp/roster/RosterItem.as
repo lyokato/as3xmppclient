@@ -65,8 +65,6 @@ package org.coderepos.net.xmpp.roster
 
         */
 
-
-
         public function RosterItem(jid:JID):void
         {
             _jid       = jid;

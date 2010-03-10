@@ -48,6 +48,14 @@ package org.coderepos.net.xmpp.handler
             // send initial presence
             _stream.send('<presence/>');
 
+            _stream.send(
+                  '<iq type="' + IQType.GET
+                    + '" to="' + _stream.boundJID.domain
+                    + '" id="' + _stream.genNextID() + '">'
+                + '<query xmlns="' + XMPPNamespace.DISCO_ITEMS + '"/>'
+                + '</iq>'
+            );
+
             /*
             TODO:
             [XEP-0115: Entity Capabilities]
@@ -323,6 +331,8 @@ package org.coderepos.net.xmpp.handler
                 handleVcardIQ(elem);
             } else if (elem.getFirstElementNS(XMPPNamespace.DISCO_INFO, "query") != null) {
                 handleDiscoInfoIQ(elem);
+            } else if (elem.getFirstElementNS(XMPPNamespace.DISCO_ITEMS, "query") != null) {
+                handleDiscoItemsIQ(elem);
             } else if (elem.getFirstElementNS(XMPPNamespace.IQ_VERSION, "query") != null) {
                 handleVersionIQ(elem);
             } else if (elem.getFirstElementNS(XMPPNamespace.IQ_LAST, "query") != null) {
@@ -419,6 +429,40 @@ package org.coderepos.net.xmpp.handler
             }
         }
 
+        private function handleDiscoItemsIQ(elem:XMLElement):void
+        {
+            trace("[iq:disco:items]");
+            var type:String = elem.getAttr("type");
+            if (type == null)
+                throw new XMPPProtocolError("iq@type not found");
+
+            var sender:String = elem.getAttr("from");
+            if (sender == null)
+                throw new XMPPProtocolError("iq@from not found");
+
+            if (type == IQType.RESULT) {
+                if (sender == _stream.boundJID.domain) {
+                    var query:XMLElement =
+                        elem.getFirstElementNS(XMPPNamespace.DISCO_ITEMS, "query");
+                    var items:Array = query.getElements("item");
+                    for each(var itemElem:XMLElement in items) {
+                        var serviceJID:String = itemElem.getAttr("jid");
+                        if (serviceJID != null) {
+                            _stream.addService(serviceJID);
+                            _stream.send(
+                                  '<iq id="' + _stream.genNextID()
+                                    + '" to="' + serviceJID
+                                    + '" type="' + IQType.GET + '">'
+                                + '<query xmlns="' + XMPPNamespace.DISCO_INFO + '"/>'
+                                + '</iq>'
+                            );
+                        }
+                    }
+                } else {
+
+                }
+            }
+        }
         private function handleDiscoInfoIQ(elem:XMLElement):void
         {
             trace("[iq:disco:info]");
@@ -426,13 +470,14 @@ package org.coderepos.net.xmpp.handler
             if (type == null)
                 throw new XMPPProtocolError("iq@type not found");
 
+            var sender:String = elem.getAttr("from");
+            if (sender == null)
+                throw new XMPPProtocolError("iq@from not found");
+
             if (type == IQType.GET) {
                 var iqid:String = elem.getAttr("id");
                 if (iqid == null)
                     throw new XMPPProtocolError("iq@id not found");
-                var sender:String = elem.getAttr("from");
-                if (sender == null)
-                    throw new XMPPProtocolError("iq@from not found");
 
                 var query:XMLElement =
                     elem.getFirstElementNS(XMPPNamespace.DISCO_INFO, "query");
@@ -458,7 +503,14 @@ package org.coderepos.net.xmpp.handler
                     + '</iq>'
                 );
             } else if (type == IQType.RESULT) {
-
+                if (_stream.hasService(sender)) {
+                    // service info
+                    trace('[service info]');
+                } else {
+                    trace('[contact info]');
+                    // contact info
+                    // save the capabilities with hash
+                }
             }
         }
 

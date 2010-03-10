@@ -20,17 +20,19 @@ package org.coderepos.net.xmpp
 
         public function JID(jid:String)
         {
+            // TODO: validate jid format
+
             var parts:Array = jid.split("@");
-            if (parts.length != 2)
-                throw new Error("Invalid JID format");
-
-            _node = parts[0];
-
-            parts = parts[1].split("/");
-
-            _domain = parts[0];
-            if (parts.length > 1)
-                _resource = parts[1];
+            if (parts.length != 2) {
+                //throw new Error("Invalid JID format");
+                _domain = jid;
+            } else {
+                _node = parts[0];
+                parts = parts[1].split("/");
+                _domain = parts[0];
+                if (parts.length > 1)
+                    _resource = parts[1];
+            }
         }
 
         public function get node():String

@@ -56,11 +56,17 @@ password: mypassword
 host:     chat.facebook.com
 port:     5222
 
-=== Livejournal
+=== Livejournal(LJTalk)
 
 account:  myname@livejournal.com
 password: mypassword
 host:     livejournal.com
 port:     5222
 
+=== xmpp.jp
+
+account:  myname@xmpp.jp
+password: mypassword
+host:     xmpp.jp
+port:     5222
 

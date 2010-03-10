@@ -17,16 +17,30 @@ package org.coderepos.net.xmpp.util
         private var _interval:uint;
         private var _maxCount:uint;
         private var _records:Vector.<Number>;
+        private var _isActive:Boolean;
 
         public function ReconnectionManager(intervalSeconds:uint=3600, maxCount:uint=5)
         {
+            _isActive = true;
             _interval = intervalSeconds * 1000;
             _maxCount = maxCount;
             _records = new Vector.<Number>(_maxCount);
         }
 
+        public function get isActive():Boolean
+        {
+            return _isActive;
+        }
+
+        public function inactivate():void
+        {
+            _isActive = false;
+        }
+
         public function saveRecordAndVerify():Boolean
         {
+            if (!_isActive)
+                return false;
             var now:Number = new Date().getTime();
             return saveTimeAndVerify(now);
         }
@@ -42,7 +56,8 @@ package org.coderepos.net.xmpp.util
 
         public function clear():void
         {
-            _records = new Vector.<Number>(_maxCount);
+            _records  = new Vector.<Number>(_maxCount);
+            _isActive = true;
         }
     }
 }
