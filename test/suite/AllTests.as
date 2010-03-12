@@ -8,7 +8,7 @@ package suite {
       super();
       // Add tests here
       // For examples, see: http://code.google.com/p/as3flexunitlib/wiki/Resources
-      //addTest(SomeTest.suite());
+      addTest(JIDTest.suite());
     }
     
   }

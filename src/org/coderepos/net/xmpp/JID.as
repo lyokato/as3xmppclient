@@ -30,7 +30,7 @@ package org.coderepos.net.xmpp
                 _node = parts[0];
                 parts = parts[1].split("/");
                 _domain = parts[0];
-                if (parts.length > 1)
+                if (parts.length > 1 && parts[1].length > 0)
                     _resource = parts[1];
             }
         }
@@ -67,15 +67,22 @@ package org.coderepos.net.xmpp
 
         public function toBareJIDString():String
         {
-            return _node + '@' + _domain;
+            return (_node != null) ?
+                _node + '@' + _domain : _domain;
         }
 
         public function toString():String
         {
-            var str:String = _node + "@" + _domain;
-            if (_resource != null && _resource.length > 0)
-                str += "/";
-                str += _resource;
+            var str:String
+            if (_node != null) {
+                str = _node + "@" + _domain;
+                if (_resource != null && _resource.length > 0) {
+                    str += "/";
+                    str += _resource;
+                }
+            } else {
+                str = _domain;
+            }
             return str;
         }
 

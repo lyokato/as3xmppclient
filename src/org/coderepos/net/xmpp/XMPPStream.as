@@ -604,12 +604,12 @@ package org.coderepos.net.xmpp
             // TODO: search person from roster and update 'version'
         }
 
-        /* MUC
-        public function joinRoom(roomID:JID):void
+        public function joinRoom(roomID:JID, nick:String):void
         {
-            send('<presence to="' + roomID.toBareJIDString() + '">');
+            send('<presence to="' + roomID.toBareJIDString() + "/" + nick + '">');
         }
 
+        /*
         public function sendMessageWithinRoom(roomID:JID, message:String):void
         {
             send(
