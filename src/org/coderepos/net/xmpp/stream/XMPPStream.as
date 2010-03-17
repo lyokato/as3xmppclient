@@ -12,10 +12,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 package org.coderepos.net.xmpp.stream
 {
+    import flash.utils.ByteArray;
     import flash.events.EventDispatcher;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
+
+    import com.hurlant.util.Base64;
 
     import org.coderepos.sasl.SASLMechanismFactory;
     import org.coderepos.sasl.SASLMechanismDefaultFactory;
@@ -48,6 +51,8 @@ package org.coderepos.net.xmpp.stream
     import org.coderepos.net.xmpp.caps.EntityCapabilities;
     import org.coderepos.net.xmpp.caps.EntityCapabilitiesOnMemoryStore;
     import org.coderepos.net.xmpp.caps.IEntityCapabilitiesStore;
+    import org.coderepos.net.xmpp.vcard.IAvatarStore;
+    import org.coderepos.net.xmpp.vcard.AvatarOnMemoryStore;
 
     public class XMPPStream extends EventDispatcher
     {
@@ -65,9 +70,11 @@ package org.coderepos.net.xmpp.stream
         private var _services:Object;
         private var _isReady:Boolean;
         private var _capStore:IEntityCapabilitiesStore;
+        private var _avatarStore:IAvatarStore;
 
         public function XMPPStream(config:XMPPConfig,
-            capStore:IEntityCapabilitiesStore=null)
+            capStore:IEntityCapabilitiesStore=null,
+            avatarStore:IAvatarStore=null)
         {
             _config      = config;
             _attributes  = {};
@@ -86,6 +93,8 @@ package org.coderepos.net.xmpp.stream
             );
             _capStore = (capStore == null)
                 ? new EntityCapabilitiesOnMemoryStore() : capStore;
+            _avatarStore = (avatarStore == null)
+                ? new AvatarOnMemoryStore() : avatarStore;
         }
 
         internal function get applicationName():String
@@ -452,9 +461,11 @@ package org.coderepos.net.xmpp.stream
                 children.push('<priority>' + String(priority) + '</priority>');
 
             // TODO: vcard avatar
+            //if (_avatarHash) {
             //var vCardTag:String = '<x xmlns="' + XMPPNamespace.VCARD_UPDATE + '">';
-            //vCardTag += '<photo/>'
+            //vCardTag += '<photo>' + _avatarHash + '</photo>'
             //vCardTag += '</x>';
+            //}
 
             if (children.length > 0) {
                 presenceTag += '>';
@@ -466,7 +477,7 @@ package org.coderepos.net.xmpp.stream
             send(presenceTag);
         }
 
-        internal function receivedUnavailablePresence(contact:JID):void 
+        internal function receivedUnavailablePresence(contact:JID):void
         {
             // remove resource from roster
             var item:RosterItem = getRosterItem(contact);
@@ -566,9 +577,59 @@ package org.coderepos.net.xmpp.stream
             version:String, os:String):void
         {
             // TODO: search person from roster and update 'version'
+            // should use Entity Capabilities?
         }
 
-        // Entity Capabilities
+        internal function hasAvatar(hash:String):Boolean
+        {
+            return _avatarStore.has(hash);
+        }
+
+        internal function saveAvator(type:String, avatarHash:String,
+            bytes:ByteArray):void
+        {
+            _avatarStore.store(type, avatarHash, bytes);
+        }
+
+        internal function setContactAvatar(contact:JID, photoHash:String):void
+        {
+            var resource:String  = contact.resource;
+            if (resource == null) {
+                // invalid format
+                return;
+            }
+
+            var item:RosterItem = getRosterItem(contact);
+            if (item != null && item.avatarHash != photoHash) {
+                item.avatarHash = photoHash;
+                dispatchEvent(new XMPPPresenceEvent(
+                    XMPPPresenceEvent.CHANGED, contact));
+            }
+        }
+
+        /* XEP-0153 vCard Based Avatar
+        public function updateAvator(jpegBytes:ByteArray):void
+        {
+            if (_isReady) {
+                var hasher:IHash = Crypto.getHash("sha1");
+                _avatarHash:String = Hex.fromArray(hasher.hash(jpegBytes));
+                send(
+                      '<iq type="' + IQType.SET + '" id="' + genNextID() + '">'
+                    + '<vCard xmlns="' + XMPPNamespace.VCARD + '">'
+                    + '<PHOTO>'
+                    + '<TYPE>image/jpeg</TYPE>'
+                    + '<BINVAL>'
+                    + Base64.encodeBytes(jpegBytes)
+                    + '</BINVAL>'
+                    + '</PHOTO>'
+                    + '</vCard>'
+                    + '</iq>'
+                );
+            }
+        }
+        */
+
+        // XEP-0115 Entity Capabilities
         public function contactSupportFeature(contact:JID, featureNS:String):Boolean
         {
             var resource:String  = contact.resource;

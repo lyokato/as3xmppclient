@@ -57,13 +57,8 @@ package org.coderepos.net.xmpp.roster
         private var _groups:Object;
         private var _resources:Object;
 
-        /*
-
-        // XEP-0153 vCard-Based Avatars
-        private var _photoHash:String;
-        private var _photoPath:String;
-
-        */
+        // XEP-0153 vCard based avatar
+        private var _avatarHash:String;
 
         public function RosterItem(jid:JID):void
         {
@@ -121,6 +116,16 @@ package org.coderepos.net.xmpp.roster
         public function removeResource(resource:String):void
         {
             delete _resources[resource];
+        }
+
+        public function get avatarHash():String
+        {
+            return _avatarHash;
+        }
+
+        public function set avatarHash(hash:String):void
+        {
+            _avatarHash = hash;
         }
 
         public function get groups():Array

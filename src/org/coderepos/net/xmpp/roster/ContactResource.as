@@ -22,7 +22,7 @@ package org.coderepos.net.xmpp.roster
         private var _show:String;     // presence@show
         private var _priority:uint;   // presence@priority
 
-        // XEP-0153 Entity Capabilities
+        // XEP-0115 Entity Capabilities
         private var _caps:Object;
 
         // XEP-0012 Last Activity
@@ -30,7 +30,6 @@ package org.coderepos.net.xmpp.roster
 
         // XEP-0085 Chat State Notification
         private var _chatState:String;
-
 
         public function ContactResource(resource:String, presence:XMPPPresence)
         {
@@ -94,6 +93,7 @@ package org.coderepos.net.xmpp.roster
                 caps.push(capId);
             return caps;
         }
+
     }
 }
 

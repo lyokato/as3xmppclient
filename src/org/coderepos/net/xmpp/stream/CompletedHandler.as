@@ -13,6 +13,13 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package org.coderepos.net.xmpp.stream
 {
     import flash.system.Capabilities;
+    import flash.utils.ByteArray;
+
+    import com.hurlant.util.Hex;
+    import com.hurlant.util.Base64;
+    import com.hurlant.crypto.Crypto;
+    import com.hurlant.crypto.hash.IHash;
+
     import org.coderepos.xml.sax.XMLElementEventHandler;
     import org.coderepos.xml.XMLElement;
     import org.coderepos.xml.XMLAttributes;
@@ -291,22 +298,30 @@ package org.coderepos.net.xmpp.stream
                 checkCap(sender, c);
 
             // [XEP-0153: vCard-Based Avatars]
-            /*
             var x:XMLElement = elem.getFirstElementNS(XMPPNamespace.VCARD_UPDATE, "x");
-            if (x != null) {
-                var photo:XMLElement = x.getFirstElement("photo");
-                if (photo != null) {
-                    var photoHash:String = photo.text;
-                    if (photoHash != null && photoHash.length > 0) {
-                        if (myapp.userPhotoIsChanged(sender, photoHash)) {
-                            _stream.getVCard(sender);
-                        }
+            if (x != null)
+                checkVcard(sender, x);
+        }
+
+        private function checkVcard(sender:JID, x:XMLElement):void
+        {
+            var photo:XMLElement = x.getFirstElement("photo");
+            if (photo != null) {
+                var photoHash:String = photo.text;
+                if (photoHash != null && photoHash.length > 0) {
+                    if (_stream.hasAvatar(photoHash)) {
+                        _stream.setContactAvatar(sender, photoHash);
+                    } else {
+                        _stream.send(
+                              '<iq to="' + sender.toBareJIDString()
+                                + '" id="' + _stream.genNextID()
+                                + '" type="' + IQType.GET + '">'
+                            + '<vCard xmlns="' + XMPPNamespace.VCARD + '"/>'
+                            + '</iq>'
+                        );
                     }
                 }
             }
-            */
-
-
         }
 
         private function checkCap(sender:JID, c:XMLElement):void
@@ -560,6 +575,38 @@ package org.coderepos.net.xmpp.stream
             trace("[iq:vcard]");
             var vcard:XMLElement =
                 elem.getFirstElementNS(XMPPNamespace.VCARD, "vCard");
+
+            var type:String = elem.getAttr("type");
+            if (type == null)
+                throw new XMPPProtocolError("iq@type not found");
+
+            var senderSrc:String = elem.getAttr("from");
+            if (senderSrc == null)
+                throw new XMPPProtocolError("message@from not found");
+
+            var sender:JID;
+            try {
+                sender = new JID(senderSrc);
+            } catch (e:*) {
+                throw new XMPPProtocolError("message@from jid is invalid: " + senderSrc);
+            }
+
+            if (type == IQType.RESULT) {
+                // set avatar
+                var photoElem:XMLElement = vcard.getFirstElement("PHOTO");
+                if (photoElem == null)
+                    return;
+                var typeElem:XMLElement = photoElem.getFirstElement("TYPE");
+                var binElem:XMLElement = photoElem.getFirstElement("BINVAL");
+                if (typeElem == null || binElem == null)
+                    return;
+                var photoBytes:ByteArray = Base64.decodeToByteArray(binElem.text);
+                var hasher:IHash = Crypto.getHash("sha1");
+                var avatarHash:String = Hex.fromArray(hasher.hash(photoBytes));
+                _stream.saveAvator(typeElem.text, avatarHash, photoBytes);
+                _stream.setContactAvatar(sender, avatarHash);
+            }
+
         }
 
         private function handleBlockingIQ(elem:XMLElement):void
