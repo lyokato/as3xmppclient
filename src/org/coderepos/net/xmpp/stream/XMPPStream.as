@@ -10,7 +10,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package org.coderepos.net.xmpp
+package org.coderepos.net.xmpp.stream
 {
     import flash.events.EventDispatcher;
     import flash.events.Event;
@@ -23,15 +23,17 @@ package org.coderepos.net.xmpp
 
     import org.coderepos.xml.sax.XMLElementEventHandler;
 
-    import org.coderepos.net.xmpp.handler.IXMPPStreamHandler;
-    import org.coderepos.net.xmpp.handler.InitialHandler;
-    import org.coderepos.net.xmpp.handler.TLSHandler;
-    import org.coderepos.net.xmpp.handler.SASLHandler;
-    import org.coderepos.net.xmpp.handler.ResourceBindingHandler;
-    import org.coderepos.net.xmpp.handler.SessionEstablishmentHandler;
-    import org.coderepos.net.xmpp.handler.InitialRosterHandler;
-    import org.coderepos.net.xmpp.handler.CompletedHandler;
-
+    import org.coderepos.net.xmpp.JID;
+    import org.coderepos.net.xmpp.XMPPNamespace;
+    import org.coderepos.net.xmpp.XMPPMessage;
+    import org.coderepos.net.xmpp.XMPPPresence;
+    import org.coderepos.net.xmpp.XMPPConfig;
+    import org.coderepos.net.xmpp.XMPPConnection;
+    import org.coderepos.net.xmpp.IQType;
+    import org.coderepos.net.xmpp.MessageType;
+    import org.coderepos.net.xmpp.PresenceType;
+    import org.coderepos.net.xmpp.StatusType;
+    import org.coderepos.net.xmpp.SubscriptionType;
     import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
     import org.coderepos.net.xmpp.events.XMPPStreamEvent;
     import org.coderepos.net.xmpp.events.XMPPMessageEvent;
@@ -79,73 +81,61 @@ package org.coderepos.net.xmpp
             );
         }
 
-        [InternalAPI]
-        public function get applicationName():String
+        internal function get applicationName():String
         {
             return _config.applicationName;
         }
 
-        [InternalAPI]
-        public function get applicationVersion():String
+        internal function get applicationVersion():String
         {
             return _config.applicationVersion;
         }
 
-        [InternalAPI]
-        public function get applicationNode():String
+        internal function get applicationNode():String
         {
             return _config.applicationNode;
         }
 
-        [InternalAPI]
-        public function get applicationType():String
+        internal function get applicationType():String
         {
             return _config.applicationType;
         }
 
-        [InternalAPI]
-        public function get applicationCategory():String
+        internal function get applicationCategory():String
         {
             return _config.applicationCategory;
         }
 
-        [InternalAPI]
-        public function genNextID():String
+        internal function genNextID():String
         {
             return _idGenerator.generate();
         }
 
-        [InternalAPI]
-        public function get domain():String
+        internal function get domain():String
         {
             return _jid.domain;
         }
 
-        [InternalAPI]
-        public function set features(features:XMPPServerFeatures):void
+        internal function set features(features:XMPPServerFeatures):void
         {
             _features = features;
         }
 
-        [ExternalAPI]
         public function getAttribute(key:String):String
         {
             return (key in _attributes) ? _attributes[key] : null;
         }
 
-        [ExternalAPI]
         public function setAttribute(key:String, value:String):void
         {
             _attributes[key] = value;
         }
 
-        [ExternalAPI]
         public function get connected():Boolean
         {
             return (_connection != null && _connection.connected);
         }
 
-        [ExternalAPI]
         public function start():void
         {
             if (connected)
@@ -162,36 +152,31 @@ package org.coderepos.net.xmpp
             dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.START));
         }
 
-        [ExternalAPI]
         public function send(s:String):void
         {
             if (connected)
                 _connection.send(s);
         }
 
-        [InternalAPI]
-        public function setXMLEventHandler(handler:XMLElementEventHandler):void
+        internal function setXMLEventHandler(handler:XMLElementEventHandler):void
         {
             if (connected)
                 _connection.setXMLEventHandler(handler);
         }
 
-        [InternalAPI]
-        public function dispose():void
+        internal function dispose():void
         {
             _handler = null;
             _isReady = false;
         }
 
-        [InternalAPI]
-        public function clearBuffer():void
+        internal function clearBuffer():void
         {
             trace("[CLEAR BUFFER]");
             if (_connection != null)
                 _connection.clearBuffer();
         }
 
-        [ExternalAPI]
         public function disconnect():void
         {
             if (connected) {
@@ -207,15 +192,13 @@ package org.coderepos.net.xmpp
             }
         }
 
-        [InternalAPI]
-        public function changeState(handler:IXMPPStreamHandler):void
+        internal function changeState(handler:IXMPPStreamHandler):void
         {
             _handler = handler;
             _handler.run();
         }
 
-        [InternalAPI]
-        public function initiated():void
+        internal function initiated():void
         {
             if (_features.supportTLS) {
                 dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.TLS_NEGOTIATING));
@@ -233,15 +216,13 @@ package org.coderepos.net.xmpp
             }
         }
 
-        [InternalAPI]
-        public function switchToTLS():void
+        internal function switchToTLS():void
         {
             if (connected)
                 _connection.startTLS();
         }
 
-        [InternalAPI]
-        public function tlsNegotiated():void
+        internal function tlsNegotiated():void
         {
             var mech:ISASLMechanism = findProperSASLMechanism();
             if (mech != null) {
@@ -254,8 +235,7 @@ package org.coderepos.net.xmpp
             }
         }
 
-        [InternalAPI]
-        public function authenticated():void
+        internal function authenticated():void
         {
             if (_features.supportResourceBinding) {
                 dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.BINDING_RESOURCE));
@@ -273,8 +253,7 @@ package org.coderepos.net.xmpp
             return _boundJID;
         }
 
-        [InternalAPI]
-        public function bindJID(jid:JID):void
+        internal function bindJID(jid:JID):void
         {
             _boundJID = jid;
             if (_features.supportSession) {
@@ -286,39 +265,33 @@ package org.coderepos.net.xmpp
             }
         }
 
-        [InternalAPI]
-        public function establishedSession():void
+        internal function establishedSession():void
         {
             dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.LOADING_ROSTER));
             changeState(new InitialRosterHandler(this));
         }
 
-        [InternalAPI]
-        public function addService(serviceJID:String):void
+        internal function addService(serviceJID:String):void
         {
             _services[serviceJID] = null;
         }
 
-        [InternalAPI]
-        public function hasService(serviceJID:String):Boolean {
+        internal function hasService(serviceJID:String):Boolean {
             return (serviceJID in _services);
         }
 
-        [ExternalAPI]
         public function get roster():Object
         {
             // should make iterator to encupsulate?
             return _roster;
         }
 
-        [ExternalAPI]
         public function getRosterItem(jid:JID):RosterItem
         {
             var bareJID:String = jid.toBareJIDString();
             return (bareJID in _roster) ? _roster[bareJID] : null;
         }
 
-        [ExternalAPI]
         public function getContactResource(jid:JID):ContactResource
         {
             var resource:String = jid.resource;
@@ -330,8 +303,7 @@ package org.coderepos.net.xmpp
             return item.getResource(resource);
         }
 
-        [InternalAPI]
-        public function initiatedRoster():void
+        internal function initiatedRoster():void
         {
             dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.READY));
             changeState(new CompletedHandler(this));
@@ -352,8 +324,7 @@ package org.coderepos.net.xmpp
             return mech;
         }
 
-        [InternalAPI]
-        public function setRosterItem(rosterItem:RosterItem):void
+        internal function setRosterItem(rosterItem:RosterItem):void
         {
             var contact:JID = rosterItem.jid;
             var bareJID:String = contact.toBareJIDString();
@@ -365,8 +336,7 @@ package org.coderepos.net.xmpp
             dispatchEvent(new XMPPRosterEvent(XMPPRosterEvent.CHANGED, contact));
         }
 
-        [InternalAPI]
-        public function changedChatState(from:JID, state:String):void
+        internal function changedChatState(from:JID, state:String):void
         {
             var bareJID:String = from.toBareJIDString();
             var resource:String  = from.resource;
@@ -385,13 +355,11 @@ package org.coderepos.net.xmpp
             }
         }
 
-        [InternalAPI]
-        public function receivedMessage(message:XMPPMessage):void
+        internal function receivedMessage(message:XMPPMessage):void
         {
             dispatchEvent(new XMPPMessageEvent(XMPPMessageEvent.RECEIVED, message));
         }
 
-        [ExternalAPI]
         public function sendMessage(contact:JID, body:String):void
         {
             var bareJID:String  = contact.toBareJIDString();
@@ -459,7 +427,6 @@ package org.coderepos.net.xmpp
             );
         }
 
-        [ExternalAPI]
         public function changePresence(show:String, status:String, priority:int=0):void
         {
             if (!_isReady)
@@ -493,8 +460,7 @@ package org.coderepos.net.xmpp
             send(presenceTag);
         }
 
-        [InternalAPI]
-        public function receivedPresence(presence:XMPPPresence):void
+        internal function receivedPresence(presence:XMPPPresence):void
         {
             var contact:JID = presence.from;
             var item:RosterItem = getRosterItem(presence.from);
@@ -515,14 +481,12 @@ package org.coderepos.net.xmpp
                 XMPPPresenceEvent.CHANGED, contact));
         }
 
-        [InternalAPI]
-        public function receivedSubscriptionRequest(sender:JID):void
+        internal function receivedSubscriptionRequest(sender:JID):void
         {
             dispatchEvent(new XMPPSubscriptionEvent(
                 XMPPSubscriptionEvent.RECEIVED, sender));
         }
 
-        [ExternalAPI]
         public function acceptSubscriptionRequest(contact:JID):void
         {
             if (_isReady)
@@ -532,7 +496,6 @@ package org.coderepos.net.xmpp
                 );
         }
 
-        [ExternalAPI]
         public function denySubscriptionRequest(contact:JID):void
         {
             if (_isReady)
@@ -542,14 +505,12 @@ package org.coderepos.net.xmpp
                 );
         }
 
-        [InternalAPI]
-        public function receivedSubscriptionResponse(sender:JID, type:String):void
+        internal function receivedSubscriptionResponse(sender:JID, type:String):void
         {
             // dispatch only?
             // no need to edit some roster data, because roster-push comes.
         }
 
-        [ExternalAPI]
         public function subscribe(contact:JID):void
         {
             if (_isReady)
@@ -557,7 +518,6 @@ package org.coderepos.net.xmpp
                     + '" type="' + PresenceType.SUBSCRIBE + '" />');
         }
 
-        [ExternalAPI]
         public function unsubscribe(contact:JID):void
         {
             if (_isReady && contact.toBareJIDString() in _roster)
@@ -565,7 +525,6 @@ package org.coderepos.net.xmpp
                     + '" type="' + PresenceType.UNSUBSCRIBE + '" />');
         }
 
-        [ExternalAPI]
         public function getLastSeconds(contact:JID):void
         {
             if (_isReady) // and check if this contacts support jappber:iq:last
@@ -578,13 +537,11 @@ package org.coderepos.net.xmpp
                 );
         }
 
-        [InternalAPI]
-        public function gotLastSeconds(contact:JID, seconds:uint):void
+        internal function gotLastSeconds(contact:JID, seconds:uint):void
         {
             // TODO: search person from roster and update 'seconds'
         }
 
-        [ExternalAPI]
         public function getVersion(contact:JID):void
         {
             if (_isReady) // and check if this contacts support jappber:iq:version
@@ -597,16 +554,38 @@ package org.coderepos.net.xmpp
                 );
         }
 
-        [InternalAPI]
-        public function gotVersion(contact:JID, name:String,
+        internal function gotVersion(contact:JID, name:String,
             version:String, os:String):void
         {
             // TODO: search person from roster and update 'version'
         }
 
+        // MUC
         public function joinRoom(roomID:JID, nick:String):void
         {
+            // _room[roomID.toBareJIDString()]
             send('<presence to="' + roomID.toBareJIDString() + "/" + nick + '">');
+        }
+
+        public function changeRoomNick(roomID:JID, nick:String):void
+        {
+            // _room[roomID.toBareJIDString()]
+            send('<presence to="' + roomID.toBareJIDString() + "/" + nick + '">');
+        }
+
+        public function exitRoom(roomID:JID, nick:String, message:String=null):void
+        {
+            var presenceTag:String =
+                '<presence type="' + PresenceType.UNAVAILABLE
+                + '" to="' + roomID.toBareJIDString() + "/" + nick + '"';
+            if (message != null) {
+                presenceTag += ">";
+                presenceTag += "<status>" + message + "</status>";
+                presenceTag += "</presence>";
+            } else {
+                presenceTag += " />"
+            }
+            send(presenceTag);
         }
 
         /*
@@ -620,11 +599,6 @@ package org.coderepos.net.xmpp
                 );
         }
 
-        public function partFromRoom(roomUserID:JID):void
-        {
-            send('<presence type="' + PresenceType.UNAVAILABLE
-                + '" to="' + roomUserID.toString() + '"/>');
-        }
         */
 
         private function connectHandler(e:Event):void

@@ -10,32 +10,49 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package org.coderepos.net.xmpp.handler
+package org.coderepos.net.xmpp.stream
 {
-    import org.coderepos.net.xmpp.XMPPStream;
-    import org.coderepos.net.xmpp.XMPPServerFeatures;
+    import com.adobe.utils.StringUtil;
+    import com.hurlant.util.Base64;
+
     import org.coderepos.net.xmpp.XMPPNamespace;
     import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
+
+    import org.coderepos.sasl.mechanisms.ISASLMechanism;
+    import org.coderepos.sasl.exceptions.SASLBadChallengeError;
 
     import org.coderepos.xml.XMLAttributes;
     import org.coderepos.xml.XMLElement;
     import org.coderepos.xml.sax.XMLElementEventHandler;
 
-    public class TLSHandler implements IXMPPStreamHandler
+    public class SASLHandler implements IXMPPStreamHandler
     {
         private var _stream:XMPPStream;
+        private var _mech:ISASLMechanism;
 
-        public function TLSHandler(stream:XMPPStream)
+        public function SASLHandler(stream:XMPPStream, mech:ISASLMechanism)
         {
             _stream = stream;
+            _mech   = mech;
         }
 
         public function run():void
         {
             _stream.setXMLEventHandler(getHandler());
-            _stream.send(
-                '<starttls xmlns="' + XMPPNamespace.TLS + '"/>'
-            );
+            var authTag:String =
+                '<auth '
+                    + 'xmlns="'+XMPPNamespace.SASL+'" '
+                    + 'mechanism="'+ _mech.name +'"';
+            var start:String = _mech.start();
+            trace("[SASL:start]");
+            if (start != null && start.length > 0) {
+                authTag += '>';
+                authTag += Base64.encode(start);
+                authTag += '</auth>';
+            } else {
+                authTag += ' />';
+            }
+            _stream.send(authTag);
         }
 
         public function getHandler():XMLElementEventHandler
@@ -46,16 +63,19 @@ package org.coderepos.net.xmpp.handler
             handler.registerElementEvent(
                 XMPPNamespace.STREAM, "features", 1, featuresHandler);
             handler.registerElementEvent(
-                XMPPNamespace.TLS, "proceed", 1, proceedHandler);
+                XMPPNamespace.SASL, "challenge", 1, challengeHandler);
             handler.registerElementEvent(
-                XMPPNamespace.TLS, "failure", 1, failureHandler);
-            handler.registerUnknownElementEvent(unknownHandler);
+                XMPPNamespace.SASL, "failure", 1, failureHandler);
+            handler.registerElementEvent(
+                XMPPNamespace.SASL, "success", 1, successHandler);
+            handler.registerElementEvent(
+                XMPPNamespace.SASL, "abort", 1, abortHandler);
             return handler;
         }
 
         private function streamHandler(attrs:XMLAttributes):void
         {
-            // after TLS negotiation, new stream comes
+            // after SASL authentication completed
             trace("[STREAM]");
             var id:String = attrs.getValue("id");
             if (id == null)
@@ -71,18 +91,43 @@ package org.coderepos.net.xmpp.handler
 
         private function featuresHandler(elem:XMLElement):void
         {
-            // after TLS negotiation, new stream comes
+            // after SASL authentication completed
             trace("[FEATURES]");
             _stream.features = XMPPServerFeatures.fromElement(elem);
-            _stream.tlsNegotiated();
+            _stream.authenticated();
         }
 
-        private function proceedHandler(elem:XMLElement):void
+        private function challengeHandler(elem:XMLElement):void
         {
-            trace("[TLS:proceed]");
-            _stream.switchToTLS();
+            var challenge:String = StringUtil.trim(Base64.decode(elem.text));
+            var response:String;
+            try {
+                response = _mech.step(challenge);
+            } catch (e:*) {
+                if (e is SASLBadChallengeError) {
+                    throw new XMPPProtocolError("SASL bad challenge:" + challenge);
+                } else {
+                    throw e;
+                }
+            }
             _stream.send(
-            //'<?xml version="1.0" encoding="utf-8"?>'
+                  '<response xmlns="' + XMPPNamespace.SASL + '">'
+                + Base64.encode(response)
+                + '</response>'
+            );
+        }
+
+        private function failureHandler(elem:XMLElement):void
+        {
+            trace("[SASL:failure]");
+            throw new XMPPProtocolError("SASL failure");
+        }
+
+        private function successHandler(elem:XMLElement):void
+        {
+            trace("[SASL:success]");
+            _stream.clearBuffer();
+            _stream.send(
             '<stream:stream '
             +   'xmlns="' + XMPPNamespace.CLIENT + '" '
             +   'xmlns:stream="' + XMPPNamespace.STREAM + '" '
@@ -91,18 +136,10 @@ package org.coderepos.net.xmpp.handler
             );
         }
 
-        private function failureHandler(elem:XMLElement):void
+        private function abortHandler(elem:XMLElement):void
         {
-            // not come here,
-            // because as3crypto TLSEngine disconnect socket on failure.
-            trace("[TLS:failure]");
-        }
-
-        private function unknownHandler(ns:String, localName:String, depth:uint):void
-        {
-            trace("[UNKNOWN]");
-            trace(ns);
-            trace(localName);
+            trace("[SASL:abort]");
+            throw new XMPPProtocolError("SASL aborted");
         }
     }
 }

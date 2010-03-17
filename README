@@ -21,6 +21,10 @@ version, and fixed them to be built without error.
 
 = TODO
 
+== Connection
+
+disconnect on IOError/SecurityError?
+
 == XEP
 
 XEP-0012: Last Activity
@@ -47,7 +51,7 @@ X-FACEBOOK-PLATFORM
 account:  myname@gmail.com
 password: mypassword
 host:     talk.google.com
-port:     5223
+port:     5222(5223?)
 
 === Facebook Chat
 
@@ -69,4 +73,12 @@ account:  myname@xmpp.jp
 password: mypassword
 host:     xmpp.jp
 port:     5222
+
+=== AOL(not working now)
+
+account:  myname@aol.com
+password: mypassword
+host:     xmpp.oscar.aol.com
+port:     5222
+
 

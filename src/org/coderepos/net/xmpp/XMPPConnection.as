@@ -143,12 +143,14 @@ package org.coderepos.net.xmpp
 
         private function ioErrorHandler(e:IOErrorEvent):void
         {
+            trace("[socket:io]" + String(_socket.connected));
             dispose();
             dispatchEvent(e);
         }
 
         private function securityErrorHandler(e:SecurityErrorEvent):void
         {
+            trace("[socket:sec]" + String(_socket.connected));
             dispose();
             dispatchEvent(e);
         }

@@ -10,7 +10,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package org.coderepos.net.xmpp.handler
+package org.coderepos.net.xmpp.stream
 {
     import flash.system.Capabilities;
     import org.coderepos.xml.sax.XMLElementEventHandler;
@@ -22,13 +22,11 @@ package org.coderepos.net.xmpp.handler
     import org.coderepos.net.xmpp.JID;
     import org.coderepos.net.xmpp.XMPPPresence;
     import org.coderepos.net.xmpp.XMPPMessage;
-    import org.coderepos.net.xmpp.XMPPStream;
     import org.coderepos.net.xmpp.IQType;
     import org.coderepos.net.xmpp.PresenceType;
     import org.coderepos.net.xmpp.MessageType;
     import org.coderepos.net.xmpp.SubscriptionType;
     import org.coderepos.net.xmpp.ChatState;
-    import org.coderepos.net.xmpp.XMPPServerFeatures;
     import org.coderepos.net.xmpp.XMPPNamespace;
     import org.coderepos.net.xmpp.roster.RosterItem;
     import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;

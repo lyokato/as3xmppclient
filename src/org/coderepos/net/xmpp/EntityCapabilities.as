@@ -38,6 +38,7 @@ package org.coderepos.net.xmpp
                 if (name != null && category != null && type != null) {
                     cap.addIdentity(name, category, type, lang);
                 } else {
+                    // XXX: should throw exception?
                     // throw new XMPPProtocolError("invalid identity");
                 }
             }

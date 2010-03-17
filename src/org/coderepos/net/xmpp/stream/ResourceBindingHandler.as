@@ -10,13 +10,12 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package org.coderepos.net.xmpp.handler
+package org.coderepos.net.xmpp.stream
 {
     import org.coderepos.xml.sax.XMLElementEventHandler;
     import org.coderepos.xml.XMLElement;
     import org.coderepos.xml.XMLAttributes;
 
-    import org.coderepos.net.xmpp.XMPPStream;
     import org.coderepos.net.xmpp.JID;
     import org.coderepos.net.xmpp.IQType;
     import org.coderepos.net.xmpp.XMPPNamespace;

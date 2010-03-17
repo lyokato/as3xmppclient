@@ -9,9 +9,9 @@ package
 
     import nl.demonsters.debugger.MonsterDebugger;
 
+    import org.coderepos.net.xmpp.stream.XMPPStream;
     import org.coderepos.net.xmpp.JID;
     import org.coderepos.net.xmpp.XMPPConfig;
-    import org.coderepos.net.xmpp.XMPPStream;
     import org.coderepos.net.xmpp.XMPPMessage;
     import org.coderepos.net.xmpp.events.XMPPErrorEvent;
     import org.coderepos.net.xmpp.events.XMPPStreamEvent;
