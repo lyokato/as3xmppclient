@@ -51,10 +51,12 @@ package org.coderepos.net.xmpp
 
         public function dispose():void
         {
+            /*
             if (_socket != null) {
                 removeSocketEventListeners(_socket);
                 _socket = null;
             }
+            */
             _parser.reset();
         }
 
@@ -75,8 +77,12 @@ package org.coderepos.net.xmpp
             if (connected)
                 throw new Error("already connected.");
 
-            _socket = new Socket();
-            addSocketEventListeners(_socket);
+            if (_socket == null || _socket is TLSSocket) {
+                if (_socket != null)
+                    removeSocketEventListeners(_socket);
+                _socket = new Socket();
+                addSocketEventListeners(_socket);
+            }
             _socket.connect(_config.host, _config.port);
         }
 

@@ -30,6 +30,7 @@ package org.coderepos.net.xmpp.stream
     import org.coderepos.net.xmpp.XMPPNamespace;
     import org.coderepos.net.xmpp.roster.RosterItem;
     import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
+    import org.coderepos.net.xmpp.caps.EntityCapabilities;
 
     public class CompletedHandler implements IXMPPStreamHandler
     {
@@ -252,7 +253,6 @@ package org.coderepos.net.xmpp.stream
 
         private function handlePresence(type:String, elem:XMLElement):void
         {
-            var isAvailable:Boolean = (type == "");
             var senderSrc:String = elem.getAttr("from");
             if (senderSrc == null)
                 throw new XMPPProtocolError("presence@from not found");
@@ -263,6 +263,11 @@ package org.coderepos.net.xmpp.stream
             } catch (e:*) {
                 throw new XMPPProtocolError(
                     "presence@from is invalid JID: " + senderSrc);
+            }
+
+            if (type == PresenceType.UNAVAILABLE) {
+                _stream.receivedUnavailablePresence(sender);
+                return;
             }
 
             var showElem:XMLElement = elem.getFirstElement("show");
@@ -277,24 +282,13 @@ package org.coderepos.net.xmpp.stream
             var priority:int = (priElem != null)
                 ? int(priElem.text) : 0;
 
+            _stream.receivedPresence(new XMPPPresence(
+                sender, show, status, priority));
 
             // [XEP-0115 Entity Capabilities]
-            /*
             var c:XMLElement = elem.getFirstElementNS(XMPPNamespace.CAPS, "c");
-            if (c != null) {
-                var hash:String = c.getAttr("hash");
-                var node:String = c.getAttr("node");
-                var ver:String  = c.getAttr("ver");
-
-                if (!myapp.knowThisNode) {
-                    _stream.send(
-                          '<iq id="" to="' + senderSrc + '" type="' + IQType.GET + '">'
-                        + '<query xmlns="' + XMPPNamespace.DISCO_INFO + '" node="' + node + '#' +  ver + '"/>'
-                        + '</iq>'
-                    );
-                }
-            }
-            */
+            if (c != null)
+                checkCap(sender, c);
 
             // [XEP-0153: vCard-Based Avatars]
             /*
@@ -312,9 +306,46 @@ package org.coderepos.net.xmpp.stream
             }
             */
 
-            _stream.receivedPresence(new XMPPPresence(
-                sender, isAvailable, show, status, priority));
 
+        }
+
+        private function checkCap(sender:JID, c:XMLElement):void
+        {
+            var node:String = c.getAttr("node");
+            var ver:String  = c.getAttr("ver");
+
+            // invalid form of element
+            if (node == null || ver == null)
+                return;
+
+            var hash:String = c.getAttr("hash");
+
+            var senderSrc:String = sender.toString();
+
+            var capId:String = node + '#' + ver;
+            if (_stream.hasCap(capId)) {
+                _stream.setContactCap(sender, capId);
+            } else {
+                _stream.send(
+                      '<iq id="" to="' + senderSrc + '" type="' + IQType.GET + '">'
+                    + '<query xmlns="' + XMPPNamespace.DISCO_INFO + '" node="' + capId + '"/>'
+                    + '</iq>'
+                );
+            }
+
+            var ext:String = c.getAttr("ext");
+            if (ext != null) {
+                var extCapId:String = node + '#' + ext;
+                if (_stream.hasCap(extCapId)) {
+                    _stream.setContactCap(sender, extCapId);
+                } else {
+                    _stream.send(
+                          '<iq id="" to="' + senderSrc + '" type="' + IQType.GET + '">'
+                        + '<query xmlns="' + XMPPNamespace.DISCO_INFO + '" node="' + extCapId + '"/>'
+                        + '</iq>'
+                    );
+                }
+            }
         }
 
         private function iqHandler(elem:XMLElement):void
@@ -472,14 +503,14 @@ package org.coderepos.net.xmpp.stream
             if (sender == null)
                 throw new XMPPProtocolError("iq@from not found");
 
+            var query:XMLElement =
+                elem.getFirstElementNS(XMPPNamespace.DISCO_INFO, "query");
+            var node:String = query.getAttr("node");
+
             if (type == IQType.GET) {
                 var iqid:String = elem.getAttr("id");
                 if (iqid == null)
                     throw new XMPPProtocolError("iq@id not found");
-
-                var query:XMLElement =
-                    elem.getFirstElementNS(XMPPNamespace.DISCO_INFO, "query");
-                var node:String = query.getAttr("node");
 
                 var queryTag:String = '<query xmlns="' + XMPPNamespace.DISCO_INFO + '"'
                 if (node != null)
@@ -507,7 +538,12 @@ package org.coderepos.net.xmpp.stream
                 } else {
                     trace('[contact info]');
                     // contact info
-                    // save the capabilities with hash
+                    if (node != null) {
+                        // response for Entity Capabilities
+                        // save the capabilities with hash
+                        var cap:EntityCapabilities = EntityCapabilities.fromElement(query);
+                        _stream.storeCap(node, cap);
+                    }
                 }
             }
         }

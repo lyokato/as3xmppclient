@@ -18,6 +18,7 @@ package org.coderepos.net.xmpp.events
     public class XMPPPresenceEvent extends Event
     {
         public static const CHANGED:String = "presenceChanged";
+        public static const LEAVED:String  = "presenceLeaved";
 
         private var _contact:JID;
 

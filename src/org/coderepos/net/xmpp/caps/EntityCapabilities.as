@@ -10,7 +10,7 @@ OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
-package org.coderepos.net.xmpp
+package org.coderepos.net.xmpp.caps
 {
     import flash.utils.ByteArray;
 
@@ -46,7 +46,12 @@ package org.coderepos.net.xmpp
             for each(var feature:XMLElement in features)
                 cap.addFeature(feature.text);
 
-            query.getElementsNS(XMPPNamespace.DATA, "x");
+            /*
+            var forms:Array = query.getElementsNS(XMPPNamespace.DATA, "x");
+            for each(var form:XMLElement in forms) {
+
+            }
+            */
 
             return cap;
         }

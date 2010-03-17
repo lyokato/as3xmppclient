@@ -14,7 +14,6 @@ package org.coderepos.net.xmpp.roster
 {
     import org.coderepos.net.xmpp.XMPPPresence;
     import org.coderepos.net.xmpp.StatusType;
-    import org.coderepos.net.xmpp.EntityCapabilities;
 
     public class ContactResource
     {
@@ -24,7 +23,7 @@ package org.coderepos.net.xmpp.roster
         private var _priority:uint;   // presence@priority
 
         // XEP-0153 Entity Capabilities
-        private var _capability:EntityCapabilities;
+        private var _caps:Object;
 
         // XEP-0012 Last Activity
         private var _last:uint;
@@ -32,12 +31,14 @@ package org.coderepos.net.xmpp.roster
         // XEP-0085 Chat State Notification
         private var _chatState:String;
 
+
         public function ContactResource(resource:String, presence:XMPPPresence)
         {
             _resource  = resource;
             _chatState = null;
             _status    = presence.status;
             _show      = presence.show;
+            _caps      = {};
         }
 
         public function updatePresence(presence:XMPPPresence):void
@@ -74,6 +75,24 @@ package org.coderepos.net.xmpp.roster
         public function get resource():String
         {
             return _resource;
+        }
+
+        public function hasCap(capId:String):Boolean
+        {
+            return (capId in _caps);
+        }
+
+        public function setCap(capId:String):void
+        {
+            _caps[capId] = 1;
+        }
+
+        public function getCaps():Array
+        {
+            var caps:Array = [];
+            for(var capId:String in _caps)
+                caps.push(capId);
+            return caps;
         }
     }
 }

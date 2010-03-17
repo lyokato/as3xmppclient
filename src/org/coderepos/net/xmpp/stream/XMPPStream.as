@@ -45,6 +45,9 @@ package org.coderepos.net.xmpp.stream
     import org.coderepos.net.xmpp.util.ReconnectionManager;
     import org.coderepos.net.xmpp.roster.RosterItem;
     import org.coderepos.net.xmpp.roster.ContactResource;
+    import org.coderepos.net.xmpp.caps.EntityCapabilities;
+    import org.coderepos.net.xmpp.caps.EntityCapabilitiesOnMemoryStore;
+    import org.coderepos.net.xmpp.caps.IEntityCapabilitiesStore;
 
     public class XMPPStream extends EventDispatcher
     {
@@ -61,8 +64,10 @@ package org.coderepos.net.xmpp.stream
         private var _roster:Object;
         private var _services:Object;
         private var _isReady:Boolean;
+        private var _capStore:IEntityCapabilitiesStore;
 
-        public function XMPPStream(config:XMPPConfig)
+        public function XMPPStream(config:XMPPConfig,
+            capStore:IEntityCapabilitiesStore=null)
         {
             _config      = config;
             _attributes  = {};
@@ -79,6 +84,8 @@ package org.coderepos.net.xmpp.stream
                 _config.reconnectionAcceptableInterval,
                 _config.reconnectionMaxCountWithinInterval
             );
+            _capStore = (capStore == null)
+                ? new EntityCapabilitiesOnMemoryStore() : capStore;
         }
 
         internal function get applicationName():String
@@ -296,7 +303,8 @@ package org.coderepos.net.xmpp.stream
         {
             var resource:String = jid.resource;
             if (resource == null || resource.length == 0)
-                throw new ArgumentError("This is not full JID: " + jid.toString());
+                return null;
+                //throw new ArgumentError("This is not full JID: " + jid.toString());
             var item:RosterItem = getRosterItem(jid);
             if (item == null)
                 return null;
@@ -336,22 +344,20 @@ package org.coderepos.net.xmpp.stream
             dispatchEvent(new XMPPRosterEvent(XMPPRosterEvent.CHANGED, contact));
         }
 
-        internal function changedChatState(from:JID, state:String):void
+        internal function changedChatState(contact:JID, state:String):void
         {
-            var bareJID:String = from.toBareJIDString();
-            var resource:String  = from.resource;
+            var bareJID:String = contact.toBareJIDString();
+            var resource:String  = contact.resource;
             if (resource == null) {
                 // invalid format
                 return;
             }
 
-            var res:ContactResource = getContactResource(from);
-            if (res == null) {
-                // unknown contact
-            } else {
+            var res:ContactResource = getContactResource(contact);
+            if (res != null && res.chatState != state) {
                 res.chatState = state;
                 dispatchEvent(new XMPPPresenceEvent(
-                    XMPPPresenceEvent.CHANGED, from));
+                    XMPPPresenceEvent.CHANGED, contact));
             }
         }
 
@@ -460,25 +466,27 @@ package org.coderepos.net.xmpp.stream
             send(presenceTag);
         }
 
+        internal function receivedUnavailablePresence(contact:JID):void 
+        {
+            // remove resource from roster
+            var item:RosterItem = getRosterItem(contact);
+            if (item != null) {
+                item.removeResource(contact.resource);
+                dispatchEvent(new XMPPPresenceEvent(
+                    XMPPPresenceEvent.LEAVED, contact));
+            }
+        }
+
         internal function receivedPresence(presence:XMPPPresence):void
         {
             var contact:JID = presence.from;
             var item:RosterItem = getRosterItem(presence.from);
 
-            if (item == null) {
-                // presence for unknown contact
-            } else {
-                if (presence.isAvailable) {
-                    item.setResource(contact.resource, presence);
-                } else {
-                    // XXX: check if resource is not null?
-                    item.removeResource(contact.resource);
-                    //dispatchEvent(new XMPPPresenceEvent(
-                    //    XMPPPresenceEvent.REMOVED, contact));
-                }
+            if (item != null) {
+                item.setResource(contact.resource, presence);
+                dispatchEvent(new XMPPPresenceEvent(
+                    XMPPPresenceEvent.CHANGED, contact));
             }
-            dispatchEvent(new XMPPPresenceEvent(
-                XMPPPresenceEvent.CHANGED, contact));
         }
 
         internal function receivedSubscriptionRequest(sender:JID):void
@@ -558,6 +566,32 @@ package org.coderepos.net.xmpp.stream
             version:String, os:String):void
         {
             // TODO: search person from roster and update 'version'
+        }
+
+        // Entity Capabilities
+        internal function storeCap(node:String, cap:EntityCapabilities):void
+        {
+            _capStore.store(node, cap);
+        }
+
+        internal function hasCap(node:String):Boolean
+        {
+            return _capStore.has(node);
+        }
+
+        internal function setContactCap(contact:JID, capId:String):void
+        {
+            var resource:String  = contact.resource;
+            if (resource == null) {
+                // invalid format
+                return;
+            }
+            var res:ContactResource = getContactResource(contact);
+            if (res != null && !res.hasCap(capId)) {
+                res.setCap(capId);
+                dispatchEvent(new XMPPPresenceEvent(
+                    XMPPPresenceEvent.CHANGED, contact));
+            }
         }
 
         // MUC
