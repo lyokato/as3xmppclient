@@ -569,6 +569,25 @@ package org.coderepos.net.xmpp.stream
         }
 
         // Entity Capabilities
+        public function contactSupportFeature(contact:JID, featureNS:String):Boolean
+        {
+            var resource:String  = contact.resource;
+            if (resource == null)
+                return false;
+
+            var res:ContactResource = getContactResource(contact);
+            if (res == null)
+                return false;
+
+            var caps:Array = contact.getCaps();
+            for each(capId:String in caps) {
+                var cap:EntityCapabilities = _capStore.getCap(capId);
+                if (cap != null && cap.supportFeature(featureNS))
+                    return true;
+            }
+            return false;
+        }
+
         internal function storeCap(node:String, cap:EntityCapabilities):void
         {
             _capStore.store(node, cap);

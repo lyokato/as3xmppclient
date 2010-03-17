@@ -23,15 +23,12 @@
   </compiler>
   <include-classes>
       <class>org.coderepos.date.W3CDTF</class>
-      <class>org.coderepos.net.xmpp.XMPPStream</class>
       <class>org.coderepos.net.xmpp.XMPPConfig</class>
       <class>org.coderepos.net.xmpp.XMPPConnection</class>
       <class>org.coderepos.net.xmpp.XMPPNamespace</class>
       <class>org.coderepos.net.xmpp.XMPPMessage</class>
       <class>org.coderepos.net.xmpp.XMPPPresence</class>
-      <class>org.coderepos.net.xmpp.XMPPServerFeatures</class>
       <class>org.coderepos.net.xmpp.ChatState</class>
-      <class>org.coderepos.net.xmpp.EntityCapabilities</class>
       <class>org.coderepos.net.xmpp.JID</class>
       <class>org.coderepos.net.xmpp.IQType</class>
       <class>org.coderepos.net.xmpp.MessageType</class>
@@ -39,20 +36,25 @@
       <class>org.coderepos.net.xmpp.StatusType</class>
       <class>org.coderepos.net.xmpp.SubscriptionType</class>
       <class>org.coderepos.net.xmpp.exceptions.XMPPProtocolError</class>
+      <class>org.coderepos.net.xmpp.caps.EntityCapabilities</class>
+      <class>org.coderepos.net.xmpp.caps.IEntityCapabilitiesStore</class>
+      <class>org.coderepos.net.xmpp.caps.EntityCapabilitiesOnMemoryStore</class>
       <class>org.coderepos.net.xmpp.events.XMPPErrorEvent</class>
       <class>org.coderepos.net.xmpp.events.XMPPStreamEvent</class>
       <class>org.coderepos.net.xmpp.events.XMPPPresenceEvent</class>
       <class>org.coderepos.net.xmpp.events.XMPPMessageEvent</class>
       <class>org.coderepos.net.xmpp.events.XMPPRosterEvent</class>
       <class>org.coderepos.net.xmpp.events.XMPPSubscriptionEvent</class>
-      <class>org.coderepos.net.xmpp.handler.IXMPPStreamHandler</class>
-      <class>org.coderepos.net.xmpp.handler.InitialHandler</class>
-      <class>org.coderepos.net.xmpp.handler.TLSHandler</class>
-      <class>org.coderepos.net.xmpp.handler.SASLHandler</class>
-      <class>org.coderepos.net.xmpp.handler.ResourceBindingHandler</class>
-      <class>org.coderepos.net.xmpp.handler.SessionEstablishmentHandler</class>
-      <class>org.coderepos.net.xmpp.handler.InitialRosterHandler</class>
-      <class>org.coderepos.net.xmpp.handler.CompletedHandler</class>
+      <class>org.coderepos.net.xmpp.stream.IXMPPStreamstream</class>
+      <class>org.coderepos.net.xmpp.stream.Initialstream</class>
+      <class>org.coderepos.net.xmpp.stream.TLSstream</class>
+      <class>org.coderepos.net.xmpp.stream.SASLstream</class>
+      <class>org.coderepos.net.xmpp.stream.ResourceBindingstream</class>
+      <class>org.coderepos.net.xmpp.stream.SessionEstablishmentstream</class>
+      <class>org.coderepos.net.xmpp.stream.InitialRosterstream</class>
+      <class>org.coderepos.net.xmpp.stream.Completedstream</class>
+      <class>org.coderepos.net.xmpp.stream.XMPPStream</class>
+      <class>org.coderepos.net.xmpp.stream.XMPPServerFeatures</class>
       <class>org.coderepos.net.xmpp.roster.RosterItem</class>
       <class>org.coderepos.net.xmpp.roster.ContactResource</class>
       <class>org.coderepos.net.xmpp.util.IDGenerator</class>
