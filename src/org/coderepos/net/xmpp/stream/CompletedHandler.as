@@ -327,23 +327,30 @@ package org.coderepos.net.xmpp.stream
                 _stream.setContactCap(sender, capId);
             } else {
                 _stream.send(
-                      '<iq id="" to="' + senderSrc + '" type="' + IQType.GET + '">'
-                    + '<query xmlns="' + XMPPNamespace.DISCO_INFO + '" node="' + capId + '"/>'
+                      '<iq id="' + _stream.genNextID()
+                        + '" to="' + senderSrc + '" type="' + IQType.GET + '">'
+                    + '<query xmlns="' + XMPPNamespace.DISCO_INFO
+                        + '" node="' + capId + '"/>'
                     + '</iq>'
                 );
             }
 
-            var ext:String = c.getAttr("ext");
-            if (ext != null) {
-                var extCapId:String = node + '#' + ext;
-                if (_stream.hasCap(extCapId)) {
-                    _stream.setContactCap(sender, extCapId);
-                } else {
-                    _stream.send(
-                          '<iq id="" to="' + senderSrc + '" type="' + IQType.GET + '">'
-                        + '<query xmlns="' + XMPPNamespace.DISCO_INFO + '" node="' + extCapId + '"/>'
-                        + '</iq>'
-                    );
+            var exts:String = c.getAttr("ext");
+            if (exts != null) {
+                var extParts:Array = exts.split(/\s+/);
+                for each(var ext:String in extParts) {
+                    var extCapId:String = node + '#' + ext;
+                    if (_stream.hasCap(extCapId)) {
+                        _stream.setContactCap(sender, extCapId);
+                    } else {
+                        _stream.send(
+                              '<iq id="' + _stream.genNextID()
+                                + '" to="' + senderSrc + '" type="' + IQType.GET + '">'
+                            + '<query xmlns="' + XMPPNamespace.DISCO_INFO
+                                + '" node="' + extCapId + '"/>'
+                            + '</iq>'
+                        );
+                    }
                 }
             }
         }

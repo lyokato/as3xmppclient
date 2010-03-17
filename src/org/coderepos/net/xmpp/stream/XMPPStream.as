@@ -579,9 +579,9 @@ package org.coderepos.net.xmpp.stream
             if (res == null)
                 return false;
 
-            var caps:Array = contact.getCaps();
-            for each(capId:String in caps) {
-                var cap:EntityCapabilities = _capStore.getCap(capId);
+            var caps:Array = res.getCaps();
+            for each(var capId:String in caps) {
+                var cap:EntityCapabilities = _capStore.get(capId);
                 if (cap != null && cap.supportFeature(featureNS))
                     return true;
             }
