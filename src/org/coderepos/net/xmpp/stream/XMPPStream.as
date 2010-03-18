@@ -13,6 +13,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package org.coderepos.net.xmpp.stream
 {
     import flash.utils.ByteArray;
+    import flash.display.DisplayObject;
     import flash.events.EventDispatcher;
     import flash.events.Event;
     import flash.events.IOErrorEvent;
@@ -341,6 +342,16 @@ package org.coderepos.net.xmpp.stream
             return mech;
         }
 
+        internal function getPresenceCapsTag():String
+        {
+            return _config.buildPresenceCapsTag();
+        }
+
+        internal function getDiscoInfoFeatureTags():String
+        {
+            return _config.buildDiscoInfoFeatureTags();
+        }
+
         internal function setRosterItem(rosterItem:RosterItem):void
         {
             var contact:JID = rosterItem.jid;
@@ -460,6 +471,8 @@ package org.coderepos.net.xmpp.stream
             if (priority != 0)
                 children.push('<priority>' + String(priority) + '</priority>');
 
+            children.push(_config.buildPresenceCapsTag());
+
             // TODO: vcard avatar
             //if (_avatarHash) {
             //var vCardTag:String = '<x xmlns="' + XMPPNamespace.VCARD_UPDATE + '">';
@@ -578,6 +591,19 @@ package org.coderepos.net.xmpp.stream
         {
             // TODO: search person from roster and update 'version'
             // should use Entity Capabilities?
+        }
+
+        // FIXME: later
+        //public function getContactAvatar(contact:JID):DisplayObject
+        public function getContactAvatar(contact:JID):ByteArray
+        {
+            var item:RosterItem = getRosterItem(contact);
+            var avatarHash:String = item.avatarHash;
+            if (avatarHash == null)
+                return null;
+            if (!_avatarStore.has(avatarHash))
+                return null;
+            return _avatarStore.get(avatarHash);
         }
 
         internal function hasAvatar(hash:String):Boolean

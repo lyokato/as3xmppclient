@@ -87,6 +87,7 @@ package org.coderepos.net.xmpp.roster
             return (resource in _resources);
         }
 
+
         public function setResource(resource:String, presence:XMPPPresence):void
         {
             if (resource in _resources) {
@@ -94,6 +95,32 @@ package org.coderepos.net.xmpp.roster
             } else {
                 _resources[resource] = new ContactResource(resource, presence);
             }
+        }
+
+        public function get hasAvtiveResource():Boolean
+        {
+            for (var prop:String in _resources) {
+                var resource:ContactResource = _resources[prop];
+                if (resource.isActive)
+                    return true;
+            }
+            return false;
+        }
+
+        public function getActiveResource():ContactResource
+        {
+            var choosed:ContactResource = null;
+            for (var prop:String in _resources) {
+                var resource:ContactResource = _resources[prop];
+                if (resource.isActive) {
+                    if (choosed == null) {
+                        choosed = resource;
+                    } else if (choosed.priority < resource.priority) {
+                        choosed = resource;
+                    }
+                }
+            }
+            return choosed;
         }
 
         public function getAllActiveResources():Array

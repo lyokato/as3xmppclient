@@ -52,7 +52,7 @@ package org.coderepos.net.xmpp.stream
         {
             _stream.setXMLEventHandler(getHandler());
             // send initial presence
-            _stream.send('<presence/>');
+            _stream.send('<presence>' + _stream.getPresenceCapsTag() + '</presence>');
 
             _stream.send(
                   '<iq type="' + IQType.GET
@@ -61,22 +61,6 @@ package org.coderepos.net.xmpp.stream
                 + '<query xmlns="' + XMPPNamespace.DISCO_ITEMS + '"/>'
                 + '</iq>'
             );
-
-            /*
-            TODO:
-            [XEP-0115: Entity Capabilities]
-            http://xmpp.org/extensions/xep-0115.html
-
-            _stream.send(
-              '<presence>'
-            + '<c xmlns="' + XMPPNamespace.CAPS + '"'
-            +  ' hash="sha-1"'
-            +  ' node=""'
-            +  ' ver=""/>'
-            + '</presence>'
-            );
-
-            */
         }
 
         private function getHandler():XMLElementEventHandler
@@ -388,6 +372,8 @@ package org.coderepos.net.xmpp.stream
                 handleVersionIQ(elem);
             } else if (elem.getFirstElementNS(XMPPNamespace.IQ_LAST, "query") != null) {
                 handleLastIQ(elem);
+            } else {
+                handleUnknownIQ(elem);
             }
         }
 
@@ -542,14 +528,7 @@ package org.coderepos.net.xmpp.stream
                 _stream.send(
                       '<iq id="' + iqid + '" to="' + sender + '" type="' + IQType.RESULT + '">'
                     + queryTag
-                    + '<identity category="' + _stream.applicationCategory
-                        + '" name="' + _stream.applicationName
-                        + '" type="' + _stream.applicationType + '"/>'
-                    + '<feature var="http://jabber.org/protocol/caps"/>'
-                    + '<feature var="http://jabber.org/protocol/diso#info"/>'
-                    + '<feature var="vcard-temp:x:update"/>'
-                    + '<feature var="jabber:iq:version"/>'
-                    //+ '<feature var="jabber:iq:last"/>'
+                    + _stream.getDiscoInfoFeatureTags()
                     + '</query>'
                     + '</iq>'
                 );
@@ -564,7 +543,8 @@ package org.coderepos.net.xmpp.stream
                         // response for Entity Capabilities
                         // save the capabilities with hash
                         var cap:EntityCapabilities = EntityCapabilities.fromElement(query);
-                        _stream.storeCap(node, cap);
+                        if (cap != null)
+                            _stream.storeCap(node, cap);
                     }
                 }
             }
@@ -652,6 +632,11 @@ package org.coderepos.net.xmpp.stream
             } else if (type == IQType.RESULT) {
                 // do something?
             }
+        }
+
+        private function handleUnknownIQ(elem:XMLElement):void
+        {
+            // do something?
         }
     }
 }

@@ -38,12 +38,14 @@ package org.coderepos.net.xmpp.roster
             _status    = presence.status;
             _show      = presence.show;
             _caps      = {};
+            _priority  = 0;
         }
 
         public function updatePresence(presence:XMPPPresence):void
         {
-            _status = presence.status;
-            _show   = presence.show;
+            _status   = presence.status;
+            _show     = presence.show;
+            _priority = presence.priority;
         }
 
         public function get isActive():Boolean
@@ -69,6 +71,16 @@ package org.coderepos.net.xmpp.roster
         public function get show():String
         {
             return _show;
+        }
+
+        public function get priority():uint
+        {
+            return _priority;
+        }
+
+        public function set priority(p:uint):void
+        {
+            _priority = p;
         }
 
         public function get resource():String

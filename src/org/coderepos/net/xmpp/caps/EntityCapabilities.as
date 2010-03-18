@@ -79,13 +79,21 @@ package org.coderepos.net.xmpp.caps
                 { name:name, category:category, type:type, lang:lang });
         }
 
-        public function genInfoQueryXMLString(node:String):String
+        public function buildDiscoInfoQueryTag(node:String):String
         {
             var verifier:String = genVerifier("sha1");
             node += "#";
             node += verifier;
             var q:String = '<query xmlns="' + XMPPNamespace.DISCO_INFO
                 + '" node="' + node + '">'
+            q += buildDiscoInfoFeatureTags();
+            q += '</query>';
+            return q;
+        }
+
+        public function buildDiscoInfoFeatureTags():String
+        {
+            var q:String = "";
             for each(var identity:Object in _identities) {
                 q += '<identity category="' + identity.category
                     + '" name="' + identity.name
@@ -94,10 +102,9 @@ package org.coderepos.net.xmpp.caps
                     q += 'xml:lang="' + identity.lang + '" '
                 q += '/>';
             }
-            for each(var feature:String in _features) {
+            for (var feature:String in _features) {
                 q += '<feature var="' + feature + '" />';
             }
-            q += '</query>';
             return q;
         }
 

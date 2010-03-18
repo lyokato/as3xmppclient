@@ -35,9 +35,10 @@ package org.coderepos.net.xmpp.vcard
         }
 
         // XXX: should return content-type
+        //public function get(hash:String):DisplayObject
         public function get(hash:String):ByteArray
         {
-           return (hash in _store) ? _store[hash] : null; 
+           return (hash in _store) ? _store[hash] : null;
         }
     }
 }
