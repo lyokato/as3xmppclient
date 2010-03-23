@@ -70,20 +70,19 @@ package org.coderepos.net.xmpp
                 _cap = new EntityCapabilities();
                 _cap.addIdentity(applicationName, applicationCategory,
                     applicationType, applicationLanguage);
-                _cap.addFeature( XMPPNamespace.CAPS );
-                _cap.addFeature( XMPPNamespace.DISCO_INFO );
-                _cap.addFeature( XMPPNamespace.VCARD_UPDATE );
-                _cap.addFeature( XMPPNamespace.IQ_VERSION );
-                //_cap.addFeature( XMPPNamespace.IQ_LAST );
+                _cap.addFeature(XMPPNamespace.CAPS);
+                _cap.addFeature(XMPPNamespace.DISCO_INFO);
+                _cap.addFeature(XMPPNamespace.VCARD_UPDATE);
+                _cap.addFeature(XMPPNamespace.IQ_VERSION);
+                //_cap.addFeature(XMPPNamespace.IQ_LAST);
             }
             return _cap;
         }
 
         private function getVerifier():String
         {
-            if (_verifier == null) {
+            if (_verifier == null)
                 _verifier = getCap().genVerifier("sha1");
-            }
             return _verifier;
         }
 

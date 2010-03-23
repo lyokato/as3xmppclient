@@ -34,6 +34,7 @@ package org.coderepos.net.xmpp
 
     import org.coderepos.net.xmpp.events.XMPPErrorEvent;
     import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
+    import org.coderepos.net.xmpp.exceptions.XMPPAuthError;
 
     public class XMPPConnection extends EventDispatcher
     {
@@ -67,11 +68,13 @@ package org.coderepos.net.xmpp
                 removeSocketEventListeners(_socket);
                 _socket = null;
             }
+            trace("============= parser reset ============");
             _parser.reset();
         }
 
         public function clearBuffer():void
         {
+            trace("============= parser reset ============");
             _parser.reset();
         }
 
@@ -207,6 +210,11 @@ package org.coderepos.net.xmpp
 
                     dispatchEvent(new XMPPErrorEvent(
                         XMPPErrorEvent.PROTOCOL_ERROR, e.message));
+
+                } else if (e is XMPPAuthError) {
+
+                    dispatchEvent(new XMPPErrorEvent(
+                        XMPPErrorEvent.AUTH_ERROR, e.message));
 
                 } else {
 

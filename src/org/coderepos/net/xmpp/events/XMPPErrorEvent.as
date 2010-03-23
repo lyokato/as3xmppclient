@@ -17,6 +17,7 @@ package org.coderepos.net.xmpp.events
     public class XMPPErrorEvent extends Event
     {
         public static const PROTOCOL_ERROR:String = "protocolError";
+        public static const AUTH_ERROR:String = "authError";
 
         private var _message:String;
 

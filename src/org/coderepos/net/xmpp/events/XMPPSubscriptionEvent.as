@@ -6,7 +6,7 @@ EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
 MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
 NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
 LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION
-OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION
+OF CONTRACT, TORT OR OTHERWISE, ARISING contact, OUT OF OR IN CONNECTION
 WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 */
 
@@ -19,23 +19,23 @@ package org.coderepos.net.xmpp.events
     {
         public static const RECEIVED:String = "subscriptionReceived";
 
-        private var _from:JID;
+        private var _contact:JID;
 
-        public function XMPPSubscriptionEvent(type:String, from:JID,
+        public function XMPPSubscriptionEvent(type:String, contact:JID,
             bubbles:Boolean=false, cancelable:Boolean=false)
         {
-            _from = from;
+            _contact = contact;
             super(type, bubbles, cancelable);
         }
 
-        public function get from():JID
+        public function get contact():JID
         {
-            return _from;
+            return _contact;
         }
 
         override public function clone():Event
         {
-            return new XMPPSubscriptionEvent(type, _from, bubbles, cancelable);
+            return new XMPPSubscriptionEvent(type, _contact, bubbles, cancelable);
         }
     }
 }

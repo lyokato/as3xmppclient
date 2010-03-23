@@ -164,6 +164,7 @@ package org.coderepos.net.xmpp.stream
             _connection.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
             _connection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
             _connection.addEventListener(XMPPErrorEvent.PROTOCOL_ERROR, protocolErrorHandler);
+            _connection.addEventListener(XMPPErrorEvent.AUTH_ERROR, authErrorHandler);
             _connection.connect();
 
             dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.START));
@@ -228,7 +229,7 @@ package org.coderepos.net.xmpp.stream
                 } else {
                     // XXX: Accept anonymous ?
                     throw new XMPPProtocolError(
-                        "Server doesn't support SASL");
+                        "Server doesn't support SASL mechanisms which this library supports.");
                 }
             }
         }
@@ -248,7 +249,7 @@ package org.coderepos.net.xmpp.stream
             } else {
                 // XXX: Accept anonymous ?
                 throw new XMPPProtocolError(
-                    "Server doesn't support SASL");
+                    "Server doesn't support SASL mechanisms which this library supports.");
             }
         }
 
@@ -515,8 +516,15 @@ package org.coderepos.net.xmpp.stream
 
         internal function receivedSubscriptionRequest(sender:JID):void
         {
-            dispatchEvent(new XMPPSubscriptionEvent(
-                XMPPSubscriptionEvent.RECEIVED, sender));
+            var item:RosterItem = getRosterItem(sender);
+            // if sender is in roster with subscription-status 'to',
+            // automatically accept
+            if (item != null && item.subscription == SubscriptionType.TO) {
+                acceptSubscriptionRequest(sender);
+            } else {
+                dispatchEvent(new XMPPSubscriptionEvent(
+                    XMPPSubscriptionEvent.RECEIVED, sender));
+            }
         }
 
         public function acceptSubscriptionRequest(contact:JID):void
@@ -628,7 +636,7 @@ package org.coderepos.net.xmpp.stream
             var item:RosterItem = getRosterItem(contact);
             if (item != null && item.avatarHash != photoHash) {
                 item.avatarHash = photoHash;
-                dispatchEvent(new XMPPPresenceEvent(
+                dispatchEvent(new XMPPRosterEvent(
                     XMPPPresenceEvent.CHANGED, contact));
             }
         }
@@ -781,6 +789,14 @@ package org.coderepos.net.xmpp.stream
         private function protocolErrorHandler(e:XMPPErrorEvent):void
         {
             trace("[stream:protocolError]");
+            _reconnectionManager.inactivate();
+            dispose();
+            dispatchEvent(e);
+        }
+
+        private function authErrorHandler(e:XMPPErrorEvent):void
+        {
+            trace("[stream:authError]");
             _reconnectionManager.inactivate();
             dispose();
             dispatchEvent(e);

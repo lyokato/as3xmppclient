@@ -134,6 +134,7 @@ package org.coderepos.net.xmpp.stream
             var date:Date = new Date();
 
             // TODO: [XEP-0071 XHTML-IM]
+            // var html:XMLElement = elem.getFirstElementNS(XMPPNamespace.XHTML_IM, "html");
 
             // [XEP-0091] Legacy Delayed Delivery
             var x:XMLElement = elem.getFirstElementNS(XMPPNamespace.DELAY, "x");
@@ -294,8 +295,10 @@ package org.coderepos.net.xmpp.stream
                 var photoHash:String = photo.text;
                 if (photoHash != null && photoHash.length > 0) {
                     if (_stream.hasAvatar(photoHash)) {
+                        trace("found avatar for: " + photoHash);
                         _stream.setContactAvatar(sender, photoHash);
                     } else {
+                        trace("not found avatar for: " + photoHash);
                         _stream.send(
                               '<iq to="' + sender.toBareJIDString()
                                 + '" id="' + _stream.genNextID()
@@ -323,8 +326,10 @@ package org.coderepos.net.xmpp.stream
 
             var capId:String = node + '#' + ver;
             if (_stream.hasCap(capId)) {
+                trace("found capabilities: " + capId);
                 _stream.setContactCap(sender, capId);
             } else {
+                trace("not found capabilities: " + capId);
                 _stream.send(
                       '<iq id="' + _stream.genNextID()
                         + '" to="' + senderSrc + '" type="' + IQType.GET + '">'
@@ -340,8 +345,10 @@ package org.coderepos.net.xmpp.stream
                 for each(var ext:String in extParts) {
                     var extCapId:String = node + '#' + ext;
                     if (_stream.hasCap(extCapId)) {
+                        trace("found capabilities: " + extCapId);
                         _stream.setContactCap(sender, extCapId);
                     } else {
+                        trace("not found capabilities: " + extCapId);
                         _stream.send(
                               '<iq id="' + _stream.genNextID()
                                 + '" to="' + senderSrc + '" type="' + IQType.GET + '">'
@@ -543,8 +550,12 @@ package org.coderepos.net.xmpp.stream
                         // response for Entity Capabilities
                         // save the capabilities with hash
                         var cap:EntityCapabilities = EntityCapabilities.fromElement(query);
-                        if (cap != null)
+                        if (cap != null) {
+                            trace("got capabilities");
                             _stream.storeCap(node, cap);
+                        } else {
+                            trace("invalid capabilities");
+                        }
                     }
                 }
             }

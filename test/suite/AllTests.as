@@ -9,6 +9,7 @@ package suite {
       // Add tests here
       // For examples, see: http://code.google.com/p/as3flexunitlib/wiki/Resources
       addTest(JIDTest.suite());
+      addTest(AvatarTest.suite());
     }
     
   }

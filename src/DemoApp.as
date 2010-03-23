@@ -105,6 +105,7 @@ package
             _conn.addEventListener(IOErrorEvent.IO_ERROR, ioErrorHandler);
             _conn.addEventListener(SecurityErrorEvent.SECURITY_ERROR, securityErrorHandler);
             _conn.addEventListener(XMPPErrorEvent.PROTOCOL_ERROR, protocolErrorHandler);
+            _conn.addEventListener(XMPPErrorEvent.AUTH_ERROR, authErrorHandler);
             _conn.addEventListener(XMPPStreamEvent.START, streamStartHandler);
             _conn.addEventListener(XMPPStreamEvent.TLS_NEGOTIATING, streamNegotiatingHandler);
             _conn.addEventListener(XMPPStreamEvent.AUTHENTICATING, streamAuthenticatingHandler);
@@ -171,6 +172,12 @@ package
         private function protocolErrorHandler(e:XMPPErrorEvent):void
         {
             logLine("[PROTOCOL_ERROR]");
+            logLine(e.message);
+        }
+
+        private function authErrorHandler(e:XMPPErrorEvent):void
+        {
+            logLine("[AUTH_ERROR]");
             logLine(e.message);
         }
 
