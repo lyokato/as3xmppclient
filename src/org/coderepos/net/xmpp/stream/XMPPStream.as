@@ -637,7 +637,7 @@ package org.coderepos.net.xmpp.stream
             if (item != null && item.avatarHash != photoHash) {
                 item.avatarHash = photoHash;
                 dispatchEvent(new XMPPRosterEvent(
-                    XMPPPresenceEvent.CHANGED, contact));
+                    XMPPRosterEvent.CHANGED, contact));
             }
         }
 
