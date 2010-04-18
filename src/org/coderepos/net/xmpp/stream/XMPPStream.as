@@ -541,7 +541,7 @@ package org.coderepos.net.xmpp.stream
 
         internal function receivedSubscriptionResponse(sender:JID, type:String):void
         {
-            // dispatch only?
+            // TODO: dispatch only?
             // no need to edit some roster data, because roster-push comes.
         }
 
