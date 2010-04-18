@@ -76,7 +76,7 @@ package org.coderepos.net.xmpp.stream
         private function streamHandler(attrs:XMLAttributes):void
         {
             // after SASL authentication completed
-            trace("[STREAM]");
+            //trace("[STREAM]");
             var id:String = attrs.getValue("id");
             if (id == null)
                 throw new XMPPProtocolError("stream@id not found");
@@ -92,7 +92,7 @@ package org.coderepos.net.xmpp.stream
         private function featuresHandler(elem:XMLElement):void
         {
             // after SASL authentication completed
-            trace("[FEATURES]");
+            //trace("[FEATURES]");
             _stream.features = XMPPServerFeatures.fromElement(elem);
             _stream.authenticated();
         }

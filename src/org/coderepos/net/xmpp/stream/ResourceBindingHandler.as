@@ -85,7 +85,7 @@ package org.coderepos.net.xmpp.stream
 
         private function iqHandler(elem:XMLElement):void
         {
-            trace("[ResourceBinding:iq]");
+            //trace("[ResourceBinding:iq]");
 
             var iqID:String = elem.getAttr("id");
             if (iqID != null && iqID == _currentIQID) {

@@ -68,13 +68,13 @@ package org.coderepos.net.xmpp
                 removeSocketEventListeners(_socket);
                 _socket = null;
             }
-            trace("============= parser reset ============");
+            //trace("============= parser reset ============");
             _parser.reset();
         }
 
         public function clearBuffer():void
         {
-            trace("============= parser reset ============");
+            //trace("============= parser reset ============");
             _parser.reset();
         }
 
@@ -128,7 +128,7 @@ package org.coderepos.net.xmpp
             if (!connected)
                 throw new Error("Socket not connected.");
 
-            trace(message);
+            //trace(message);
             var bytes:ByteArray = new ByteArray();
             bytes.writeUTFBytes(message);
             bytes.position = 0;
@@ -183,7 +183,7 @@ package org.coderepos.net.xmpp
                         ? _socket.bytesAvailable : 1024;
                     _socket.readBytes(bytes, 0, len);
                     bytes.position = 0;
-                    trace(bytes.readUTFBytes(bytes.length));
+                    //trace(bytes.readUTFBytes(bytes.length));
                     bytes.position = 0;
                     _parser.pushBytes(bytes);
                 }

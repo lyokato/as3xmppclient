@@ -301,7 +301,7 @@ package org.coderepos.net.xmpp.stream
                         trace("found avatar for: " + photoHash);
                         _stream.setContactAvatar(sender, photoHash);
                     } else {
-                        trace("not found avatar for: " + photoHash);
+                        //trace("not found avatar for: " + photoHash);
                         _stream.send(
                               '<iq to="' + sender.toBareJIDString()
                                 + '" id="' + _stream.genNextID()
@@ -332,7 +332,7 @@ package org.coderepos.net.xmpp.stream
                 trace("found capabilities: " + capId);
                 _stream.setContactCap(sender, capId);
             } else {
-                trace("not found capabilities: " + capId);
+                //trace("not found capabilities: " + capId);
                 _stream.send(
                       '<iq id="' + _stream.genNextID()
                         + '" to="' + senderSrc + '" type="' + IQType.GET + '">'
@@ -351,7 +351,7 @@ package org.coderepos.net.xmpp.stream
                         trace("found capabilities: " + extCapId);
                         _stream.setContactCap(sender, extCapId);
                     } else {
-                        trace("not found capabilities: " + extCapId);
+                        //trace("not found capabilities: " + extCapId);
                         _stream.send(
                               '<iq id="' + _stream.genNextID()
                                 + '" to="' + senderSrc + '" type="' + IQType.GET + '">'
@@ -389,7 +389,7 @@ package org.coderepos.net.xmpp.stream
 
         private function handleLastIQ(elem:XMLElement):void
         {
-            trace("[iq:last]");
+            //trace("[iq:last]");
             var type:String = elem.getAttr("type");
             if (type == null)
                 throw new XMPPProtocolError("iq@type not found");
@@ -433,7 +433,7 @@ package org.coderepos.net.xmpp.stream
 
         private function handleVersionIQ(elem:XMLElement):void
         {
-            trace("[iq:version]");
+            //trace("[iq:version]");
             var type:String = elem.getAttr("type");
             if (type == null)
                 throw new XMPPProtocolError("iq@type not found");
@@ -478,7 +478,7 @@ package org.coderepos.net.xmpp.stream
 
         private function handleDiscoItemsIQ(elem:XMLElement):void
         {
-            trace("[iq:disco:items]");
+            //trace("[iq:disco:items]");
             var type:String = elem.getAttr("type");
             if (type == null)
                 throw new XMPPProtocolError("iq@type not found");
@@ -512,7 +512,7 @@ package org.coderepos.net.xmpp.stream
         }
         private function handleDiscoInfoIQ(elem:XMLElement):void
         {
-            trace("[iq:disco:info]");
+            //trace("[iq:disco:info]");
             var type:String = elem.getAttr("type");
             if (type == null)
                 throw new XMPPProtocolError("iq@type not found");
@@ -545,19 +545,19 @@ package org.coderepos.net.xmpp.stream
             } else if (type == IQType.RESULT) {
                 if (_stream.hasService(sender)) {
                     // service info
-                    trace('[service info]');
+                    //trace('[service info]');
                 } else {
-                    trace('[contact info]');
+                    //trace('[contact info]');
                     // contact info
                     if (node != null) {
                         // response for Entity Capabilities
                         // save the capabilities with hash
                         var cap:EntityCapabilities = EntityCapabilities.fromElement(query);
                         if (cap != null) {
-                            trace("got capabilities");
+                            //trace("got capabilities");
                             _stream.storeCap(node, cap);
                         } else {
-                            trace("invalid capabilities");
+                            //trace("invalid capabilities");
                         }
                     }
                 }
@@ -566,7 +566,7 @@ package org.coderepos.net.xmpp.stream
 
         private function handleVcardIQ(elem:XMLElement):void
         {
-            trace("[iq:vcard]");
+            //trace("[iq:vcard]");
             var vcard:XMLElement =
                 elem.getFirstElementNS(XMPPNamespace.VCARD, "vCard");
 
@@ -605,7 +605,7 @@ package org.coderepos.net.xmpp.stream
 
         private function handleBlockingIQ(elem:XMLElement):void
         {
-            trace("[iq:block]");
+            //trace("[iq:block]");
             var block:XMLElement =
                 elem.getFirstElementNS(XMPPNamespace.BLOCKING, "block");
 
@@ -614,7 +614,7 @@ package org.coderepos.net.xmpp.stream
 
         private function handlePrivacyIQ(elem:XMLElement):void
         {
-            trace("[iq:privacy]");
+            //trace("[iq:privacy]");
             var query:XMLElement =
                 elem.getFirstElementNS(XMPPNamespace.IQ_PRIVACY, "query");
 
@@ -625,7 +625,7 @@ package org.coderepos.net.xmpp.stream
 
         private function handleRosterIQ(elem:XMLElement):void
         {
-            trace("[iq:roster]");
+            //trace("[iq:roster]");
             var type:String = elem.getAttr("type");
             if (type == null)
                 throw new XMPPProtocolError("iq@type not found");

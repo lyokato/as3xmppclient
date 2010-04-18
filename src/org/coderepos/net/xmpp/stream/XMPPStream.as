@@ -190,7 +190,7 @@ package org.coderepos.net.xmpp.stream
 
         internal function clearBuffer():void
         {
-            trace("[CLEAR BUFFER]");
+            //trace("[CLEAR BUFFER]");
             if (_connection != null)
                 _connection.clearBuffer();
         }
@@ -335,7 +335,7 @@ package org.coderepos.net.xmpp.stream
                 return null;
             var mech:ISASLMechanism = null;
             for each(var mechName:String in _features.saslMechs) {
-                trace(mechName);
+                //trace(mechName);
                 mech = _saslFactory.getMechanism(mechName);
                 if (mech != null)
                     break;
@@ -757,15 +757,15 @@ package org.coderepos.net.xmpp.stream
 
         private function closeHandler(e:Event):void
         {
-            trace("[stream:close]");
+            //trace("[stream:close]");
             dispose();
             dispatchEvent(e);
             var canRetry:Boolean = _reconnectionManager.saveRecordAndVerify();
             if (canRetry) {
-                trace("[stream:restart]");
+                //trace("[stream:restart]");
                 start();
             } else {
-                trace("[stream:clear]");
+                //trace("[stream:clear]");
                 _reconnectionManager.clear();
             }
         }

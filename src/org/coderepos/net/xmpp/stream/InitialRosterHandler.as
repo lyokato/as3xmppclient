@@ -52,7 +52,7 @@ package org.coderepos.net.xmpp.stream
 
         private function iqHandler(elem:XMLElement):void
         {
-            trace("[ROSTER:iq]");
+            //trace("[ROSTER:iq]");
 
             var type:String = elem.getAttr("type");
             if (type == null)
@@ -73,7 +73,7 @@ package org.coderepos.net.xmpp.stream
                     _stream.setRosterItem(RosterItem.fromElement(item));
                 }
 
-                trace("[ROSTER:success]");
+                //trace("[ROSTER:success]");
                 _stream.initiatedRoster();
 
             } else {

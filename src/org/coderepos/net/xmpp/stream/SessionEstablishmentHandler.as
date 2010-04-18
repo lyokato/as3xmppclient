@@ -51,7 +51,7 @@ package org.coderepos.net.xmpp.stream
 
         private function iqHandler(elem:XMLElement):void
         {
-            trace("[SESSION:iq]");
+            //trace("[SESSION:iq]");
             var type:String = elem.getAttr("type");
             if (type == null)
                 throw new XMPPProtocolError("iq@type not found");
@@ -59,7 +59,7 @@ package org.coderepos.net.xmpp.stream
             if (   type == IQType.RESULT
                 && iqID != null
                 && iqID == _currentIQID) {
-                trace("[SESSION success]");
+                //trace("[SESSION success]");
                 _stream.establishedSession();
             } else {
                 throw new XMPPProtocolError("Failed to establish session.");

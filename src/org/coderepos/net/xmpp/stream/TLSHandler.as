@@ -54,7 +54,7 @@ package org.coderepos.net.xmpp.stream
         private function streamHandler(attrs:XMLAttributes):void
         {
             // after TLS negotiation, new stream comes
-            trace("[STREAM]");
+            //trace("[STREAM]");
             var id:String = attrs.getValue("id");
             if (id == null)
                 throw new XMPPProtocolError("stream@id not found");
@@ -70,7 +70,7 @@ package org.coderepos.net.xmpp.stream
         private function featuresHandler(elem:XMLElement):void
         {
             // after TLS negotiation, new stream comes
-            trace("[FEATURES]");
+            //trace("[FEATURES]");
             _stream.features = XMPPServerFeatures.fromElement(elem);
             _stream.tlsNegotiated();
         }
