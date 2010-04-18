@@ -12,32 +12,28 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 package org.coderepos.net.xmpp.stream
 {
+    import com.hurlant.crypto.Crypto;
+    import com.hurlant.crypto.hash.IHash;
+    import com.hurlant.util.Base64;
+    import com.hurlant.util.Hex;
+
     import flash.system.Capabilities;
     import flash.utils.ByteArray;
 
-    import com.hurlant.util.Hex;
-    import com.hurlant.util.Base64;
-    import com.hurlant.crypto.Crypto;
-    import com.hurlant.crypto.hash.IHash;
-
-    import org.coderepos.xml.sax.XMLElementEventHandler;
-    import org.coderepos.xml.XMLElement;
-    import org.coderepos.xml.XMLAttributes;
-
     import org.coderepos.date.W3CDTF;
-
-    import org.coderepos.net.xmpp.JID;
-    import org.coderepos.net.xmpp.XMPPPresence;
-    import org.coderepos.net.xmpp.XMPPMessage;
-    import org.coderepos.net.xmpp.IQType;
-    import org.coderepos.net.xmpp.PresenceType;
-    import org.coderepos.net.xmpp.MessageType;
-    import org.coderepos.net.xmpp.SubscriptionType;
     import org.coderepos.net.xmpp.ChatState;
+    import org.coderepos.net.xmpp.IQType;
+    import org.coderepos.net.xmpp.JID;
+    import org.coderepos.net.xmpp.MessageType;
+    import org.coderepos.net.xmpp.PresenceType;
+    import org.coderepos.net.xmpp.XMPPMessage;
     import org.coderepos.net.xmpp.XMPPNamespace;
-    import org.coderepos.net.xmpp.roster.RosterItem;
-    import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
+    import org.coderepos.net.xmpp.XMPPPresence;
     import org.coderepos.net.xmpp.caps.EntityCapabilities;
+    import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
+    import org.coderepos.net.xmpp.roster.RosterItem;
+    import org.coderepos.xml.XMLElement;
+    import org.coderepos.xml.sax.XMLElementEventHandler;
 
     public class CompletedHandler implements IXMPPStreamHandler
     {

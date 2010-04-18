@@ -12,8 +12,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 package org.coderepos.net.xmpp.roster
 {
-    import org.coderepos.net.xmpp.XMPPPresence;
     import org.coderepos.net.xmpp.StatusType;
+    import org.coderepos.net.xmpp.XMPPPresence;
 
     public class ContactResource
     {

@@ -12,48 +12,42 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 package org.coderepos.net.xmpp.stream
 {
-    import flash.utils.ByteArray;
-    import flash.display.DisplayObject;
-    import flash.events.EventDispatcher;
     import flash.events.Event;
+    import flash.events.EventDispatcher;
     import flash.events.IOErrorEvent;
     import flash.events.SecurityErrorEvent;
+    import flash.utils.ByteArray;
 
-    import com.hurlant.util.Base64;
-
-    import org.coderepos.sasl.SASLMechanismFactory;
-    import org.coderepos.sasl.SASLMechanismDefaultFactory;
-    import org.coderepos.sasl.mechanisms.ISASLMechanism;
-
-    import org.coderepos.xml.sax.XMLElementEventHandler;
-
-    import org.coderepos.net.xmpp.JID;
-    import org.coderepos.net.xmpp.XMPPNamespace;
-    import org.coderepos.net.xmpp.XMPPMessage;
-    import org.coderepos.net.xmpp.XMPPPresence;
-    import org.coderepos.net.xmpp.XMPPConfig;
-    import org.coderepos.net.xmpp.XMPPConnection;
     import org.coderepos.net.xmpp.IQType;
+    import org.coderepos.net.xmpp.JID;
     import org.coderepos.net.xmpp.MessageType;
     import org.coderepos.net.xmpp.PresenceType;
-    import org.coderepos.net.xmpp.StatusType;
     import org.coderepos.net.xmpp.SubscriptionType;
-    import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
-    import org.coderepos.net.xmpp.events.XMPPStreamEvent;
-    import org.coderepos.net.xmpp.events.XMPPMessageEvent;
-    import org.coderepos.net.xmpp.events.XMPPRosterEvent;
-    import org.coderepos.net.xmpp.events.XMPPSubscriptionEvent;
-    import org.coderepos.net.xmpp.events.XMPPPresenceEvent;
-    import org.coderepos.net.xmpp.events.XMPPErrorEvent;
-    import org.coderepos.net.xmpp.util.IDGenerator;
-    import org.coderepos.net.xmpp.util.ReconnectionManager;
-    import org.coderepos.net.xmpp.roster.RosterItem;
-    import org.coderepos.net.xmpp.roster.ContactResource;
+    import org.coderepos.net.xmpp.XMPPConfig;
+    import org.coderepos.net.xmpp.XMPPConnection;
+    import org.coderepos.net.xmpp.XMPPMessage;
+    import org.coderepos.net.xmpp.XMPPNamespace;
+    import org.coderepos.net.xmpp.XMPPPresence;
     import org.coderepos.net.xmpp.caps.EntityCapabilities;
     import org.coderepos.net.xmpp.caps.EntityCapabilitiesOnMemoryStore;
     import org.coderepos.net.xmpp.caps.IEntityCapabilitiesStore;
-    import org.coderepos.net.xmpp.vcard.IAvatarStore;
+    import org.coderepos.net.xmpp.events.XMPPErrorEvent;
+    import org.coderepos.net.xmpp.events.XMPPMessageEvent;
+    import org.coderepos.net.xmpp.events.XMPPPresenceEvent;
+    import org.coderepos.net.xmpp.events.XMPPRosterEvent;
+    import org.coderepos.net.xmpp.events.XMPPStreamEvent;
+    import org.coderepos.net.xmpp.events.XMPPSubscriptionEvent;
+    import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
+    import org.coderepos.net.xmpp.roster.ContactResource;
+    import org.coderepos.net.xmpp.roster.RosterItem;
+    import org.coderepos.net.xmpp.util.IDGenerator;
+    import org.coderepos.net.xmpp.util.ReconnectionManager;
     import org.coderepos.net.xmpp.vcard.AvatarOnMemoryStore;
+    import org.coderepos.net.xmpp.vcard.IAvatarStore;
+    import org.coderepos.sasl.SASLMechanismDefaultFactory;
+    import org.coderepos.sasl.SASLMechanismFactory;
+    import org.coderepos.sasl.mechanisms.ISASLMechanism;
+    import org.coderepos.xml.sax.XMLElementEventHandler;
 
     public class XMPPStream extends EventDispatcher
     {

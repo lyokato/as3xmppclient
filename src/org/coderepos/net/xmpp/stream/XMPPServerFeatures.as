@@ -12,8 +12,8 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 package org.coderepos.net.xmpp.stream
 {
-    import org.coderepos.xml.XMLElement;
     import org.coderepos.net.xmpp.XMPPNamespace;
+    import org.coderepos.xml.XMLElement;
 
     public class XMPPServerFeatures
     {

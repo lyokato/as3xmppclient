@@ -12,29 +12,28 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 package org.coderepos.net.xmpp
 {
-    import flash.events.EventDispatcher;
-    import flash.events.Event;
-    import flash.events.IOErrorEvent;
-    import flash.events.SecurityErrorEvent;
-    import flash.events.ProgressEvent;
-    import flash.net.Socket;
-    import flash.utils.ByteArray;
-
-    import com.hurlant.crypto.tls.TLSSocket;
     import com.hurlant.crypto.tls.TLSConfig;
     import com.hurlant.crypto.tls.TLSEngine;
     import com.hurlant.crypto.tls.TLSSecurityParameters;
+    import com.hurlant.crypto.tls.TLSSocket;
 
-    import org.coderepos.xml.sax.XMLSAXParser;
-    import org.coderepos.xml.sax.XMLSAXParserConfig;
-    import org.coderepos.xml.sax.XMLElementEventHandler;
-    import org.coderepos.xml.exceptions.XMLSyntaxError;
-    import org.coderepos.xml.exceptions.XMLFragmentSizeOverError;
-    import org.coderepos.xml.exceptions.XMLElementDepthOverError;
+    import flash.events.Event;
+    import flash.events.EventDispatcher;
+    import flash.events.IOErrorEvent;
+    import flash.events.ProgressEvent;
+    import flash.events.SecurityErrorEvent;
+    import flash.net.Socket;
+    import flash.utils.ByteArray;
 
     import org.coderepos.net.xmpp.events.XMPPErrorEvent;
-    import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
     import org.coderepos.net.xmpp.exceptions.XMPPAuthError;
+    import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
+    import org.coderepos.xml.exceptions.XMLElementDepthOverError;
+    import org.coderepos.xml.exceptions.XMLFragmentSizeOverError;
+    import org.coderepos.xml.exceptions.XMLSyntaxError;
+    import org.coderepos.xml.sax.XMLElementEventHandler;
+    import org.coderepos.xml.sax.XMLSAXParser;
+    import org.coderepos.xml.sax.XMLSAXParserConfig;
 
     public class XMPPConnection extends EventDispatcher
     {

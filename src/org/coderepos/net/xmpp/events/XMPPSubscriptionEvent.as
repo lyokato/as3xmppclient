@@ -13,6 +13,7 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 package org.coderepos.net.xmpp.events
 {
     import flash.events.Event;
+
     import org.coderepos.net.xmpp.JID;
 
     public class XMPPSubscriptionEvent extends Event

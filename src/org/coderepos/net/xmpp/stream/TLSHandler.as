@@ -14,7 +14,6 @@ package org.coderepos.net.xmpp.stream
 {
     import org.coderepos.net.xmpp.XMPPNamespace;
     import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
-
     import org.coderepos.xml.XMLAttributes;
     import org.coderepos.xml.XMLElement;
     import org.coderepos.xml.sax.XMLElementEventHandler;

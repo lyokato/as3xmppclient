@@ -12,7 +12,6 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 package org.coderepos.net.xmpp.vcard
 {
-    import flash.display.DisplayObject;
     import flash.utils.ByteArray;
 
     public class AvatarFileStore implements IAvatarStore

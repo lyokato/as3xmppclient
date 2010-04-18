@@ -12,15 +12,14 @@ WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 
 package org.coderepos.net.xmpp.caps
 {
-    import flash.utils.ByteArray;
-
-    import com.hurlant.util.Base64;
     import com.hurlant.crypto.Crypto;
     import com.hurlant.crypto.hash.IHash;
+    import com.hurlant.util.Base64;
 
-    import org.coderepos.xml.XMLElement;
+    import flash.utils.ByteArray;
+
     import org.coderepos.net.xmpp.XMPPNamespace;
-    import org.coderepos.net.xmpp.exceptions.XMPPProtocolError;
+    import org.coderepos.xml.XMLElement;
 
     // [XEP-0115]
     public class EntityCapabilities
