@@ -619,7 +619,7 @@ package org.coderepos.net.xmpp.stream
             return _avatarStore.has(hash);
         }
 
-        internal function saveAvator(type:String, avatarHash:String,
+        internal function saveAvatar(type:String, avatarHash:String,
             bytes:ByteArray):void
         {
             _avatarStore.store(type, avatarHash, bytes);

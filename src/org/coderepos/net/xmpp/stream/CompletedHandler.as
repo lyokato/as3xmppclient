@@ -597,7 +597,7 @@ package org.coderepos.net.xmpp.stream
                 var photoBytes:ByteArray = Base64.decodeToByteArray(binElem.text);
                 var hasher:IHash = Crypto.getHash("sha1");
                 var avatarHash:String = Hex.fromArray(hasher.hash(photoBytes));
-                _stream.saveAvator(typeElem.text, avatarHash, photoBytes);
+                _stream.saveAvatar(typeElem.text, avatarHash, photoBytes);
                 _stream.setContactAvatar(sender, avatarHash);
             }
 
