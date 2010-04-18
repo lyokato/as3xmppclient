@@ -84,8 +84,7 @@ package org.coderepos.net.xmpp.stream
         private function unknownHandler(ns:String, localName:String, depth:uint):void
         {
             trace("[UNKNOWN]");
-            trace(ns);
-            trace(localName);
+            trace(ns, localName, depth);
         }
     }
 }
