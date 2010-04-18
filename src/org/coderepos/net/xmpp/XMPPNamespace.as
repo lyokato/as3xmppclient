@@ -45,7 +45,8 @@ package org.coderepos.net.xmpp
         public static const XHTML_IM:String                 = "http://jabber.org/protocol/xhtml-im";
         public static const XHTML:String                    = "http://www.w3.org/1999/xhtml";
         public static const DATA:String                     = "jabber:x:data";
-        public static const DELAY:String                    = "jabber:x:delay";
+        public static const DELAY:String                    = "urn:xmpp:delay";
+        public static const LEGACY_DELAY:String             = "jabber:x:delay";
         public static const CAPTCHA:String                  = "urn:xmpp:captcha";
 
         public static const DISCO_ITEMS:String              = "http://jabber.org/protocol/disco#items";

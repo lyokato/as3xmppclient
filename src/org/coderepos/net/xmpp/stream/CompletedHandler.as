@@ -137,7 +137,10 @@ package org.coderepos.net.xmpp.stream
             // var html:XMLElement = elem.getFirstElementNS(XMPPNamespace.XHTML_IM, "html");
 
             // [XEP-0091] Legacy Delayed Delivery
-            var x:XMLElement = elem.getFirstElementNS(XMPPNamespace.DELAY, "x");
+            // [XEP-0203] Delayed Delivery
+            var x:XMLElement = elem.getFirstElementNS(XMPPNamespace.DELAY, "delay");
+            if (x == null)
+                x = elem.getFirstElementNS(XMPPNamespace.LEGACY_DELAY, "x");
             if (x != null) {
                 var xFrom:String  = x.getAttr("from");
                 if (xFrom != null) {
