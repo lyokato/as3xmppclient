@@ -361,7 +361,7 @@ package org.coderepos.net.xmpp.stream
 
         internal function changedChatState(contact:JID, state:String):void
         {
-            var bareJID:String = contact.toBareJIDString();
+            //var bareJID:String = contact.toBareJIDString();
             var resource:String  = contact.resource;
             if (resource == null) {
                 // invalid format
