@@ -207,7 +207,7 @@ package org.coderepos.net.xmpp.stream
             } else {
 
                 // UNSUBSCRIBE request
-                // process it automatically?
+                // TODO: process it automatically?
 
                 _stream.send(
                     '<presence to="' + sender.toBareJIDString()
@@ -646,7 +646,7 @@ package org.coderepos.net.xmpp.stream
 
         private function handleUnknownIQ(elem:XMLElement):void
         {
-            // do something?
+            // TODO: do something?
         }
     }
 }
