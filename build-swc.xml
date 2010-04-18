@@ -10,11 +10,11 @@
   <target-player>10.0.0</target-player>
   <compiler>
     <external-library-path>
-      <path-element>${flexlib}/libs/player/10/playerglobal.swc</path-element>
-      <path-element>lib/as3saslcient-1_0_3.swc</path-element>
-      <path-element>lib/as3saxparser-1_0_3.swc</path-element>
+      <path-element>${flexlib}/libs/player/10.0/playerglobal.swc</path-element>
+      <path-element>lib/as3saslcient-1_0_4.swc</path-element>
+      <path-element>lib/as3saxparser-1_0_8.swc</path-element>
       <path-element>lib/as3crypto_patched.swc</path-element>
-      <path-element>lib/corelib-08.30.2007.swc</path-element>
+      <path-element>lib/corelib-04.18.2010.swc</path-element>
     </external-library-path>
     
     <source-path>
@@ -45,14 +45,14 @@
       <class>org.coderepos.net.xmpp.events.XMPPMessageEvent</class>
       <class>org.coderepos.net.xmpp.events.XMPPRosterEvent</class>
       <class>org.coderepos.net.xmpp.events.XMPPSubscriptionEvent</class>
-      <class>org.coderepos.net.xmpp.stream.IXMPPStreamstream</class>
-      <class>org.coderepos.net.xmpp.stream.Initialstream</class>
-      <class>org.coderepos.net.xmpp.stream.TLSstream</class>
-      <class>org.coderepos.net.xmpp.stream.SASLstream</class>
-      <class>org.coderepos.net.xmpp.stream.ResourceBindingstream</class>
-      <class>org.coderepos.net.xmpp.stream.SessionEstablishmentstream</class>
-      <class>org.coderepos.net.xmpp.stream.InitialRosterstream</class>
-      <class>org.coderepos.net.xmpp.stream.Completedstream</class>
+      <class>org.coderepos.net.xmpp.stream.IXMPPStreamHandler</class>
+      <class>org.coderepos.net.xmpp.stream.InitialHandler</class>
+      <class>org.coderepos.net.xmpp.stream.TLSHandler</class>
+      <class>org.coderepos.net.xmpp.stream.SASLHandler</class>
+      <class>org.coderepos.net.xmpp.stream.ResourceBindingHandler</class>
+      <class>org.coderepos.net.xmpp.stream.SessionEstablishmentHandler</class>
+      <class>org.coderepos.net.xmpp.stream.InitialRosterHandler</class>
+      <class>org.coderepos.net.xmpp.stream.CompletedHandler</class>
       <class>org.coderepos.net.xmpp.stream.XMPPStream</class>
       <class>org.coderepos.net.xmpp.stream.XMPPServerFeatures</class>
       <class>org.coderepos.net.xmpp.roster.RosterItem</class>
