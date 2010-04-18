@@ -16,14 +16,14 @@ package org.coderepos.net.xmpp.events
 
     public class XMPPStreamEvent extends Event
     {
-        public static const START:String                = "stream_start";
-        public static const CLOSE:String                = "stream_close";
-        public static const TLS_NEGOTIATING:String      = "stream_negotiationg";
-        public static const AUTHENTICATING:String       = "stream_authenticating";
-        public static const BINDING_RESOURCE:String     = "stream_binding";
-        public static const ESTABLISHING_SESSION:String = "stream_establishing";
-        public static const LOADING_ROSTER:String       = "stream_loadingRoster";
-        public static const READY:String                = "stream_ready";
+        public static const START:String                = "xmppStreamStart";
+        public static const CLOSE:String                = "xmppStreamClose";
+        public static const TLS_NEGOTIATING:String      = "xmppStreamNegotiationg";
+        public static const AUTHENTICATING:String       = "xmppStreamAuthenticating";
+        public static const BINDING_RESOURCE:String     = "xmppStreamBinding";
+        public static const ESTABLISHING_SESSION:String = "xmppStreamEstablishing";
+        public static const LOADING_ROSTER:String       = "xmppStreamLoadingRoster";
+        public static const READY:String                = "xmppStreamReady";
 
         public function XMPPStreamEvent(type:String,
             bubbles:Boolean=false, cancelable:Boolean=false)
