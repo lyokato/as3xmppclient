@@ -766,7 +766,7 @@ package org.coderepos.net.xmpp.stream
 
         private function ioErrorHandler(e:IOErrorEvent):void
         {
-            trace("[stream:ioError]");
+            trace("[stream:ioError]", e.text);
             _reconnectionManager.inactivate();
             dispose();
             dispatchEvent(e);
@@ -774,7 +774,7 @@ package org.coderepos.net.xmpp.stream
 
         private function securityErrorHandler(e:SecurityErrorEvent):void
         {
-            trace("[stream:securityError]");
+            trace("[stream:securityError]", e.text);
             _reconnectionManager.inactivate();
             dispose();
             dispatchEvent(e);
@@ -782,7 +782,7 @@ package org.coderepos.net.xmpp.stream
 
         private function protocolErrorHandler(e:XMPPErrorEvent):void
         {
-            trace("[stream:protocolError]");
+            trace("[stream:protocolError]", e.message);
             _reconnectionManager.inactivate();
             dispose();
             dispatchEvent(e);
@@ -790,7 +790,7 @@ package org.coderepos.net.xmpp.stream
 
         private function authErrorHandler(e:XMPPErrorEvent):void
         {
-            trace("[stream:authError]");
+            trace("[stream:authError]", e.message);
             _reconnectionManager.inactivate();
             dispose();
             dispatchEvent(e);
