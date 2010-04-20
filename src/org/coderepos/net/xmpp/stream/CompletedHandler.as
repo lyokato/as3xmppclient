@@ -80,7 +80,7 @@ package org.coderepos.net.xmpp.stream
                 throw new XMPPProtocolError("message@from not found");
 
             var sender:JID;
-            try {
+            try { // TODO: avoid try..catch (performance penalty)
                 sender = new JID(senderSrc);
             } catch (e:*) { // TODO: avoid catching untyped errors
                 throw new XMPPProtocolError("message@from jid is invalid: " + senderSrc);
@@ -104,8 +104,8 @@ package org.coderepos.net.xmpp.stream
                 type = MessageType.NORMAL;
             }
 
+            // TODO: should this be done here?
             // import org.coderepos.xml.XMLUtil;
-            // // should do this here?
             // subject = XMLUtil.unescapeXMLChar(subject);
             // body    = XMLUtil.unescapeXMLChar(body);
 
@@ -141,7 +141,7 @@ package org.coderepos.net.xmpp.stream
                 var xFrom:String  = x.getAttr("from");
                 if (xFrom != null) {
                     var xSender:JID;
-                    try {
+                    try { // TODO: avoid try..catch (performance penalty)
                         xSender = new JID(xFrom);
                         sender = xSender;
                     } catch (e:Error) { }
@@ -149,7 +149,7 @@ package org.coderepos.net.xmpp.stream
                 var xStamp:String = x.getAttr("stamp");
                 if (xStamp != null) {
                     var xDate:Date;
-                    try {
+                    try { // TODO: avoid try..catch (performance penalty)
                         xDate = W3CDTF.parse(xStamp);
                         date = xDate;
                     } catch (e:Error) { }
@@ -193,7 +193,7 @@ package org.coderepos.net.xmpp.stream
             if (senderSrc == null)
                 throw new XMPPProtocolError("presence@from not found");
             var sender:JID;
-            try {
+            try { // TODO: avoid try..catch (performance penalty)
                 sender = new JID(senderSrc);
             } catch (e:*) { // TODO: avoid catching untyped errors
                 throw new XMPPProtocolError(
@@ -219,7 +219,7 @@ package org.coderepos.net.xmpp.stream
             if (senderSrc == null)
                 throw new XMPPProtocolError("presence@from not found");
             var sender:JID;
-            try {
+            try { // TODO: avoid try..catch (performance penalty)
                 sender = new JID(senderSrc);
             } catch (e:*) { // TODO: avoid catching untyped errors
                 throw new XMPPProtocolError(
@@ -246,7 +246,7 @@ package org.coderepos.net.xmpp.stream
                 throw new XMPPProtocolError("presence@from not found");
 
             var sender:JID;
-            try {
+            try { // TODO: avoid try..catch (performance penalty)
                 sender = new JID(senderSrc);
             } catch (e:*) { // TODO: avoid catching untyped errors
                 throw new XMPPProtocolError(
@@ -418,7 +418,7 @@ package org.coderepos.net.xmpp.stream
                 );
             } else if (type == IQType.RESULT) {
                 var senderJID:JID;
-                try {
+                try { // TODO: avoid try..catch (performance penalty)
                     senderJID = new JID(sender);
                 } catch (e:Error) {
                     throw new XMPPProtocolError("iq@from is invalid JID: " + sender);
@@ -458,7 +458,7 @@ package org.coderepos.net.xmpp.stream
                 );
             } else if (type == IQType.RESULT) {
                 var sender:JID;
-                try {
+                try { // TODO: avoid try..catch (performance penalty)
                     sender = new JID(senderSrc);
                 } catch (e:Error) {
                     throw new XMPPProtocolError(
@@ -583,7 +583,7 @@ package org.coderepos.net.xmpp.stream
                 throw new XMPPProtocolError("message@from not found");
 
             var sender:JID;
-            try {
+            try { // TODO: avoid try..catch (performance penalty)
                 sender = new JID(senderSrc);
 
             } catch (e:*) { // TODO: avoid catching untyped errors
@@ -654,7 +654,6 @@ package org.coderepos.net.xmpp.stream
                 if (iqid != null) {
                     _stream.send('<iq type="result" id="' + iqid + '"/>');
                 }
-
             } else if (type == IQType.RESULT) {
                 // TODO: do something?
             }
