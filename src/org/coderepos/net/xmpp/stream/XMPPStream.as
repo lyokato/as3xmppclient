@@ -217,14 +217,13 @@ package org.coderepos.net.xmpp.stream
                 changeState(new TLSHandler(this));
             } else {
                 var mech:ISASLMechanism = findProperSASLMechanism();
-                if (mech != null) {
-                    dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.AUTHENTICATING));
-                    changeState(new SASLHandler(this, mech));
-                } else {
-                    // XXX: Accept anonymous ?
+                if (mech == null)
+                    // TODO: Accept anonymous?
                     throw new XMPPProtocolError(
                         "Server doesn't support SASL mechanisms which this library supports.");
-                }
+
+                dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.AUTHENTICATING));
+                changeState(new SASLHandler(this, mech));
             }
         }
 
@@ -237,14 +236,14 @@ package org.coderepos.net.xmpp.stream
         internal function tlsNegotiated():void
         {
             var mech:ISASLMechanism = findProperSASLMechanism();
-            if (mech != null) {
-                dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.AUTHENTICATING));
-                changeState(new SASLHandler(this, mech));
-            } else {
+            if (mech == null) {
                 // XXX: Accept anonymous ?
                 throw new XMPPProtocolError(
                     "Server doesn't support SASL mechanisms which this library supports.");
             }
+
+            dispatchEvent(new XMPPStreamEvent(XMPPStreamEvent.AUTHENTICATING));
+            changeState(new SASLHandler(this, mech));
         }
 
         internal function authenticated():void
@@ -294,7 +293,7 @@ package org.coderepos.net.xmpp.stream
 
         public function get roster():Object
         {
-            // should make iterator to encupsulate?
+            // TODO: should make iterator to encapsulate?
             return _roster;
         }
 
@@ -388,10 +387,7 @@ package org.coderepos.net.xmpp.stream
 
             var rosterItem:RosterItem = getRosterItem(contact);
             if (rosterItem == null) {
-
-                // FIXME: if not in roster, send normal message
                 sendNormalMessage(bareJID, body);
-
             } else {
 
                 var resources:Array;
@@ -489,11 +485,11 @@ package org.coderepos.net.xmpp.stream
         {
             // remove resource from roster
             var item:RosterItem = getRosterItem(contact);
-            if (item != null) {
-                item.removeResource(contact.resource);
-                dispatchEvent(new XMPPPresenceEvent(
-                    XMPPPresenceEvent.LEAVED, contact));
-            }
+            if (item == null)
+                return;
+
+            item.removeResource(contact.resource);
+            dispatchEvent(new XMPPPresenceEvent(XMPPPresenceEvent.LEAVED, contact));
         }
 
         internal function receivedPresence(presence:XMPPPresence):void
@@ -501,11 +497,10 @@ package org.coderepos.net.xmpp.stream
             var contact:JID = presence.from;
             var item:RosterItem = getRosterItem(presence.from);
 
-            if (item != null) {
-                item.setResource(contact.resource, presence);
-                dispatchEvent(new XMPPPresenceEvent(
-                    XMPPPresenceEvent.CHANGED, contact));
-            }
+            if (item == null)
+                return;
+            item.setResource(contact.resource, presence);
+            dispatchEvent(new XMPPPresenceEvent(XMPPPresenceEvent.CHANGED, contact));
         }
 
         internal function receivedSubscriptionRequest(sender:JID):void
@@ -592,19 +587,16 @@ package org.coderepos.net.xmpp.stream
             version:String, os:String):void
         {
             // TODO: search person from roster and update 'version'
-            // should use Entity Capabilities?
+            // TODO: should use Entity Capabilities?
         }
 
-        // FIXME: later
-        //public function getContactAvatar(contact:JID):DisplayObject
         public function getContactAvatar(contact:JID):ByteArray
         {
             var item:RosterItem = getRosterItem(contact);
             var avatarHash:String = item.avatarHash;
-            if (avatarHash == null)
+            if (avatarHash == null || !_avatarStore.has(avatarHash))
                 return null;
-            if (!_avatarStore.has(avatarHash))
-                return null;
+
             return _avatarStore.get(avatarHash);
         }
 
@@ -622,10 +614,8 @@ package org.coderepos.net.xmpp.stream
         internal function setContactAvatar(contact:JID, photoHash:String):void
         {
             var resource:String  = contact.resource;
-            if (resource == null) {
-                // invalid format
-                return;
-            }
+            if (resource == null)                
+                return; // invalid format
 
             var item:RosterItem = getRosterItem(contact);
             if (item != null && item.avatarHash != photoHash) {
@@ -635,7 +625,7 @@ package org.coderepos.net.xmpp.stream
             }
         }
 
-        /* XEP-0153 vCard Based Avatar
+        /* XEP-0153: vCard-Based Avatars http://xmpp.org/extensions/xep-0153.html
         public function updateAvator(jpegBytes:ByteArray):void
         {
             if (_isReady) {
@@ -657,7 +647,7 @@ package org.coderepos.net.xmpp.stream
         }
         */
 
-        // XEP-0115 Entity Capabilities
+        // XEP-0115 Entity Capabilities http://xmpp.org/extensions/xep-0115.html
         public function contactSupportFeature(contact:JID, featureNS:String):Boolean
         {
             var resource:String  = contact.resource;
@@ -720,17 +710,17 @@ package org.coderepos.net.xmpp.stream
             var presenceTag:String =
                 '<presence type="' + PresenceType.UNAVAILABLE
                 + '" to="' + roomID.toBareJIDString() + "/" + nick + '"';
-            if (message != null) {
+            if (message == null) {
+                presenceTag += " />"
+            } else {
                 presenceTag += ">";
                 presenceTag += "<status>" + message + "</status>";
                 presenceTag += "</presence>";
-            } else {
-                presenceTag += " />"
             }
             send(presenceTag);
         }
 
-        /*
+        /* TODO: implement
         public function sendMessageWithinRoom(roomID:JID, message:String):void
         {
             send(
@@ -751,15 +741,15 @@ package org.coderepos.net.xmpp.stream
 
         private function closeHandler(e:Event):void
         {
-            //trace("[stream:close]");
+            trace("[stream:close]");
             dispose();
             dispatchEvent(e);
             var canRetry:Boolean = _reconnectionManager.saveRecordAndVerify();
             if (canRetry) {
-                //trace("[stream:restart]");
+                trace("[stream:restart]");
                 start();
             } else {
-                //trace("[stream:clear]");
+                trace("[stream:clear]");
                 _reconnectionManager.clear();
             }
         }
