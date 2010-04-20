@@ -18,20 +18,21 @@ package org.coderepos.net.xmpp
         private var _domain:String;
         private var _resource:String;
 
-        public function JID(jid:String)
+        public function JID(jid:String) : void
         {
-            // TODO: validate jid format
+            // TODO: validate jid format and throw typed errors to avoid catching unspecified types (e:*)
 
             var parts:Array = jid.split("@");
-            if (parts.length != 2) {
-                //throw new Error("Invalid JID format");
-                _domain = jid;
-            } else {
+            if (parts.length == 2) {
                 _node = parts[0];
                 parts = parts[1].split("/");
                 _domain = parts[0];
                 if (parts.length > 1 && parts[1].length > 0)
                     _resource = parts[1];
+            } else {
+                // TODO: throw specific error
+                throw new Error("invalid format of JID");
+                //_domain = jid;
             }
         }
 
@@ -73,15 +74,15 @@ package org.coderepos.net.xmpp
 
         public function toString():String
         {
-            var str:String
-            if (_node != null) {
+            var str:String;
+            if (_node == null) {
+                str = _domain;
+            } else {
                 str = _node + "@" + _domain;
                 if (_resource != null && _resource.length > 0) {
                     str += "/";
                     str += _resource;
                 }
-            } else {
-                str = _domain;
             }
             return str;
         }
