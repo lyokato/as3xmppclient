@@ -20,7 +20,7 @@ package org.coderepos.net.xmpp
         public static const SUBSCRIBED:String   = "subscribed";
         public static const UNSUBSCRIBE:String  = "unsubscribe";
         public static const UNSUBSCRIBED:String = "unsubscribed";
-        public static const PROBE:String        = "probe";
+        //public static const PROBE:String        = "probe";
         public static const ERROR:String        = "error";
     }
 }
