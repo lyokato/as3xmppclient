@@ -82,7 +82,7 @@ package org.coderepos.net.xmpp.stream
             var sender:JID;
             try {
                 sender = new JID(senderSrc);
-            } catch (e:*) {
+            } catch (e:*) { // TODO: avoid catching untyped errors
                 throw new XMPPProtocolError("message@from jid is invalid: " + senderSrc);
             }
 
@@ -129,11 +129,11 @@ package org.coderepos.net.xmpp.stream
 
             var date:Date = new Date();
 
-            // TODO: [XEP-0071 XHTML-IM]
+            // TODO: XEP-0071: XHTML-IM http://xmpp.org/extensions/xep-0071.html
             // var html:XMLElement = elem.getFirstElementNS(XMPPNamespace.XHTML_IM, "html");
 
-            // [XEP-0091] Legacy Delayed Delivery
-            // [XEP-0203] Delayed Delivery
+            // TODO: XEP-0203: Delayed Delivery http://xmpp.org/extensions/xep-0203.html
+            // TODO: XEP-0091: Legacy Delayed Delivery http://xmpp.org/extensions/xep-0091.html (obsolete!)
             var x:XMLElement = elem.getFirstElementNS(XMPPNamespace.DELAY, "delay");
             if (x == null)
                 x = elem.getFirstElementNS(XMPPNamespace.LEGACY_DELAY, "x");
@@ -195,17 +195,14 @@ package org.coderepos.net.xmpp.stream
             var sender:JID;
             try {
                 sender = new JID(senderSrc);
-            } catch (e:*) {
+            } catch (e:*) { // TODO: avoid catching untyped errors
                 throw new XMPPProtocolError(
                     "presence@from is invalid JID: " + senderSrc);
             }
 
             if (type == PresenceType.SUBSCRIBE) {
-
                 _stream.receivedSubscriptionRequest(sender);
-
             } else {
-
                 // UNSUBSCRIBE request
                 // TODO: process it automatically?
 
@@ -224,7 +221,7 @@ package org.coderepos.net.xmpp.stream
             var sender:JID;
             try {
                 sender = new JID(senderSrc);
-            } catch (e:*) {
+            } catch (e:*) { // TODO: avoid catching untyped errors
                 throw new XMPPProtocolError(
                     "presence@from is invalid JID: " + senderSrc);
             }
@@ -251,7 +248,7 @@ package org.coderepos.net.xmpp.stream
             var sender:JID;
             try {
                 sender = new JID(senderSrc);
-            } catch (e:*) {
+            } catch (e:*) { // TODO: avoid catching untyped errors
                 throw new XMPPProtocolError(
                     "presence@from is invalid JID: " + senderSrc);
             }
@@ -276,12 +273,12 @@ package org.coderepos.net.xmpp.stream
             _stream.receivedPresence(new XMPPPresence(
                 sender, show, status, priority));
 
-            // [XEP-0115 Entity Capabilities]
+            // XEP-0115: Entity Capabilities http://xmpp.org/extensions/xep-0115.html
             var c:XMLElement = elem.getFirstElementNS(XMPPNamespace.CAPS, "c");
             if (c != null)
                 checkCap(sender, c);
 
-            // [XEP-0153: vCard-Based Avatars]
+            // XEP-0153: vCard-Based Avatars http://xmpp.org/extensions/xep-0153.html
             var x:XMLElement = elem.getFirstElementNS(XMPPNamespace.VCARD_UPDATE, "x");
             if (x != null)
                 checkVcard(sender, x);
@@ -339,27 +336,32 @@ package org.coderepos.net.xmpp.stream
             }
 
             var exts:String = c.getAttr("ext");
-            if (exts != null) {
-                var extParts:Array = exts.split(/\s+/);
-                for each(var ext:String in extParts) {
-                    var extCapId:String = node + '#' + ext;
-                    if (_stream.hasCap(extCapId)) {
-                        trace("found capabilities: " + extCapId);
-                        _stream.setContactCap(sender, extCapId);
-                    } else {
-                        //trace("not found capabilities: " + extCapId);
-                        _stream.send(
-                              '<iq id="' + _stream.genNextID()
-                                + '" to="' + senderSrc + '" type="' + IQType.GET + '">'
-                            + '<query xmlns="' + XMPPNamespace.DISCO_INFO
-                                + '" node="' + extCapId + '"/>'
-                            + '</iq>'
-                        );
-                    }
+            if (exts == null)
+                return;
+            var extParts:Array = exts.split(/\s+/);
+            for each(var ext:String in extParts) {
+                var extCapId:String = node + '#' + ext;
+                if (_stream.hasCap(extCapId)) {
+                    trace("found extended capabilities: " + extCapId);
+                    _stream.setContactCap(sender, extCapId);
+                } else {
+                    //trace("not found extended capabilities: " + extCapId);
+                    _stream.send(
+                          '<iq id="' + _stream.genNextID()
+                            + '" to="' + senderSrc + '" type="' + IQType.GET + '">'
+                        + '<query xmlns="' + XMPPNamespace.DISCO_INFO
+                            + '" node="' + extCapId + '"/>'
+                        + '</iq>'
+                    );
                 }
             }
         }
 
+        // TODO: XEP-0013: Flexible Offline Message Retrieval http://xmpp.org/extensions/xep-0013.html
+        // TODO: XEP-0020: Feature Negotiation http://xmpp.org/extensions/xep-0020.html
+        // TODO: XEP-0060: Publish-Subscribe http://xmpp.org/extensions/xep-0060.html
+        // TODO: XEP-0080: User Location http://xmpp.org/extensions/xep-0080.html
+        // TODO: XEP-0199: XMPP Ping http://xmpp.org/extensions/xep-0199.html
         private function iqHandler(elem:XMLElement):void
         {
             if (elem.getFirstElementNS(XMPPNamespace.IQ_ROSTER, "query") != null) {
@@ -383,6 +385,7 @@ package org.coderepos.net.xmpp.stream
             }
         }
 
+        // XEP-0012: Last Activity http://xmpp.org/extensions/xep-0012.html
         private function handleLastIQ(elem:XMLElement):void
         {
             //trace("[iq:last]");
@@ -427,6 +430,7 @@ package org.coderepos.net.xmpp.stream
             }
         }
 
+        // XEP-0092: Software Version http://xmpp.org/extensions/xep-0092.html
         private function handleVersionIQ(elem:XMLElement):void
         {
             //trace("[iq:version]");
@@ -472,6 +476,7 @@ package org.coderepos.net.xmpp.stream
             }
         }
 
+        // XEP-0030: Service Discovery http://xmpp.org/extensions/xep-0030.html
         private function handleDiscoItemsIQ(elem:XMLElement):void
         {
             //trace("[iq:disco:items]");
@@ -506,6 +511,8 @@ package org.coderepos.net.xmpp.stream
                 }
             }
         }
+
+        // XEP-0030: Service Discovery http://xmpp.org/extensions/xep-0030.html
         private function handleDiscoInfoIQ(elem:XMLElement):void
         {
             //trace("[iq:disco:info]");
@@ -560,6 +567,7 @@ package org.coderepos.net.xmpp.stream
             }
         }
 
+        // XEP-0054: vcard-temp http://xmpp.org/extensions/xep-0054.html
         private function handleVcardIQ(elem:XMLElement):void
         {
             //trace("[iq:vcard]");
@@ -577,7 +585,8 @@ package org.coderepos.net.xmpp.stream
             var sender:JID;
             try {
                 sender = new JID(senderSrc);
-            } catch (e:*) {
+
+            } catch (e:*) { // TODO: avoid catching untyped errors
                 throw new XMPPProtocolError("message@from jid is invalid: " + senderSrc);
             }
 
@@ -599,6 +608,7 @@ package org.coderepos.net.xmpp.stream
 
         }
 
+        // XEP-0191: Simple Communications Blocking http://xmpp.org/extensions/xep-0191.html
         private function handleBlockingIQ(elem:XMLElement):void
         {
             //trace("[iq:block]");
@@ -606,8 +616,11 @@ package org.coderepos.net.xmpp.stream
                 elem.getFirstElementNS(XMPPNamespace.BLOCKING, "block");
 
             block.getElements("item");
+
+            // TODO: do something?
         }
 
+        // XEP-0016: Privacy Lists http://xmpp.org/extensions/xep-0016.html
         private function handlePrivacyIQ(elem:XMLElement):void
         {
             //trace("[iq:privacy]");
@@ -617,8 +630,11 @@ package org.coderepos.net.xmpp.stream
             query.getFirstElement("active");
             query.getFirstElement("default");
             query.getElements("list");
+
+            // TODO: do something?
         }
 
+        // XEP-0083: Nested Roster Groups http://xmpp.org/extensions/xep-0083.html
         private function handleRosterIQ(elem:XMLElement):void
         {
             //trace("[iq:roster]");
@@ -640,7 +656,7 @@ package org.coderepos.net.xmpp.stream
                 }
 
             } else if (type == IQType.RESULT) {
-                // do something?
+                // TODO: do something?
             }
         }
 
