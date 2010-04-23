@@ -18,10 +18,10 @@ package org.coderepos.net.xmpp.events
     {
         public static const START:String                = "xmppStreamStart";
         public static const CLOSE:String                = "xmppStreamClose";
-        public static const TLS_NEGOTIATING:String      = "xmppStreamNegotiationg";
+        public static const TLS_NEGOTIATING:String      = "xmppStreamTLSNegotiating";
         public static const AUTHENTICATING:String       = "xmppStreamAuthenticating";
-        public static const BINDING_RESOURCE:String     = "xmppStreamBinding";
-        public static const ESTABLISHING_SESSION:String = "xmppStreamEstablishing";
+        public static const BINDING_RESOURCE:String     = "xmppStreamBindingResource";
+        public static const ESTABLISHING_SESSION:String = "xmppStreamEstablishingSession";
         public static const LOADING_ROSTER:String       = "xmppStreamLoadingRoster";
         public static const READY:String                = "xmppStreamReady";
 
